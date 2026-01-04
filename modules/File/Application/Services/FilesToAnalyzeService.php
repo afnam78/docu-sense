@@ -48,7 +48,7 @@ final readonly class FilesToAnalyzeService implements FilesToAnalyzeServiceInter
 
     private function manageImageFiles(TemporaryUploadedFile $file, string $hash): AnalyzeFileJob
     {
-        $entity = $this->createAndAddAliase($hash, $file);
+        $entity = $this->createAndAddAlias($hash, $file);
 
         $entity->setBase64(base64_encode(file_get_contents($file->getRealPath())));
 
@@ -60,7 +60,7 @@ final readonly class FilesToAnalyzeService implements FilesToAnalyzeServiceInter
 
     private function managePdfFiles(TemporaryUploadedFile $file, string $hash): AnalyzeFileJob
     {
-        $this->createAndAddAliase($hash, $file);
+        $this->createAndAddAlias($hash, $file);
 
         $pdf = new Pdf($file->getRealPath());
 
@@ -83,7 +83,7 @@ final readonly class FilesToAnalyzeService implements FilesToAnalyzeServiceInter
         return new AnalyzeFileJob($hash, $base64String);
     }
 
-    private function createAndAddAliase(string $hash, TemporaryUploadedFile $file): File
+    private function createAndAddAlias(string $hash, TemporaryUploadedFile $file): File
     {
         $entity = new File(
             hash: $hash,
@@ -93,7 +93,7 @@ final readonly class FilesToAnalyzeService implements FilesToAnalyzeServiceInter
         );
 
         $this->repository->save($entity);
-        $this->repository->addAliase($hash, $entity->name(), auth()->id());
+        $this->repository->addAlias($hash, $entity->name(), auth()->id());
 
         return $entity;
     }

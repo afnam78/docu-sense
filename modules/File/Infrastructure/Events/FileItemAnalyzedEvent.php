@@ -4,7 +4,7 @@ namespace Modules\File\Infrastructure\Events;
 
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use Modules\File\Domain\Entities\File;
+use Modules\OpenAI\Infrastructure\Databases\Models\OpenAiRequest;
 
 class FileItemAnalyzedEvent
 {
@@ -13,13 +13,13 @@ class FileItemAnalyzedEvent
     /**
      * Create a new event instance.
      */
-    public function __construct(private readonly File $file)
+    public function __construct(private readonly OpenAiRequest $openAIRequest)
     {
         //
     }
 
-    public function file(): File
+    public function openAIRequest(): OpenAiRequest
     {
-        return $this->file;
+        return $this->openAIRequest;
     }
 }

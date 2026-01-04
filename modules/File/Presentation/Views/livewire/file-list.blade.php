@@ -27,6 +27,9 @@
                                 <th scope="col" class="px-6 py-3 text-center">
                                     Nómina
                                 </th>
+                                <th scope="col" class="px-6 py-3 text-center">
+                                    Hash
+                                </th>
                             </tr>
                             </thead>
                             <tbody>
@@ -58,7 +61,9 @@
                                             <x-minus-circle class="size-5 text-gray-700"/>
                                         @endif
                                     </td>
-
+                                    <td class="px-6 py-4">
+                                        {{ $file->file->hash }}
+                                    </td>
                                 </tr>
                             @endforeach
                             </tbody>

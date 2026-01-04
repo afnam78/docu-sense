@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 use Modules\File\Domain\Contracts\FileRepositoryInterface;
 use Modules\File\Infrastructure\Events\FileItemAnalyzedEvent;
 use Modules\OpenAI\Domain\Contracts\OpenAIServiceInterface;
+use OpenAI\Exceptions\RateLimitException;
 use Throwable;
 
 class AnalyzeFileJob implements ShouldQueue
@@ -20,8 +21,6 @@ class AnalyzeFileJob implements ShouldQueue
     public int $timeout = 60;
 
     public int $tries = 3;
-
-    public int $backoff = 10;
 
     /**
      * Create a new job instance.
@@ -36,16 +35,16 @@ class AnalyzeFileJob implements ShouldQueue
      */
     public function handle(OpenAIServiceInterface $openAIService, FileRepositoryInterface $fileRepository): void
     {
-        $fileRepository->markAsProcessing($this->hash);
-        $result = $openAIService->analyzeDocument($this->hash, $this->base64);
-        $fileRepository->markAsDone($this->hash);
+        try {
+            $fileRepository->markAsProcessing($this->hash);
+            $openAIRequest = $openAIService->analyzeDocument($this->hash, $this->base64);
 
-        $file = $fileRepository->find($this->hash);
-        $file->setJsonResponse(json_decode($result, true));
-        $file->setAnalyzeDate(now());
-        $fileRepository->update($file);
+            $fileRepository->markAsDone($this->hash);
 
-        FileItemAnalyzedEvent::dispatch($file);
+            FileItemAnalyzedEvent::dispatchIf($openAIRequest->valid_structure, $openAIRequest);
+        } catch (RateLimitException $e) {
+            $this->release(30);
+        }
     }
 
     public function failed(?Throwable $exception): void
@@ -59,5 +58,10 @@ class AnalyzeFileJob implements ShouldQueue
     public function tags(): array
     {
         return ['analyze-file', 'file:'.$this->hash];
+    }
+
+    public function backoff(): array
+    {
+        return [10, 20, 40, 80];
     }
 }

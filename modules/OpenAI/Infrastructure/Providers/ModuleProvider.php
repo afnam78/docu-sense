@@ -12,4 +12,9 @@ class ModuleProvider extends ServiceProvider
     {
         $this->app->bind(OpenAIServiceInterface::class, OpenAIService::class);
     }
+
+    public function boot(): void
+    {
+        $this->loadMigrationsFrom(__DIR__.'/../Databases/Migrations');
+    }
 }
