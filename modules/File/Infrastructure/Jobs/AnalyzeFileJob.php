@@ -41,10 +41,11 @@ class AnalyzeFileJob implements ShouldQueue
         $fileRepository->markAsDone($this->hash);
 
         $file = $fileRepository->find($this->hash);
-        $file->setJsonResponse($result);
+        $file->setJsonResponse(json_decode($result, true));
+        $file->setAnalyzeDate(now());
         $fileRepository->update($file);
 
-        FileItemAnalyzedEvent::dispatch($this->hash);
+        FileItemAnalyzedEvent::dispatch($file);
     }
 
     public function failed(?Throwable $exception): void

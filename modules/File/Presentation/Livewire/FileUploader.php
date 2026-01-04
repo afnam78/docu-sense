@@ -30,8 +30,10 @@ class FileUploader extends Component
 
             $this->success('Analizando archivos...');
         } catch (\Exception $e) {
+            dd($e->getMessage());
             Log::error('Analyze Files Error '.$e->getMessage());
 
+            $this->error('Error al analizar los archivos');
             return;
         }
     }

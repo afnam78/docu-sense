@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('mimetype');
             $table->json('json_response')->nullable();
             $table->json('payslip_response')->nullable();
+            $table->timestamp('analyze_date')->nullable();
             $table->timestamps();
         });
     }

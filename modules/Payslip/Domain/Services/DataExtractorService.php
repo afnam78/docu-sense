@@ -13,7 +13,6 @@ final readonly class DataExtractorService implements DataExtractorServiceInterfa
     public function execute(File $file): void
     {
         $responseData = $file->jsonResponse();
-        $responseData = json_decode($responseData ?? '', true);
         if (! $responseData) {
             return;
         }

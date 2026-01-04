@@ -36,16 +36,23 @@ class CompletionRequest extends Request implements HasBody
                     'content' => [
                         [
                             'type' => 'text',
-                            'text' => 'Extrae toda la información de esta nómina siguiendo exactamente esta estructura:
-                        {
-                            "empresa": {"nombre": "", "cif": "", "ccc": ""},
-                            "trabajador": {"nombre": "", "dni": "", "naf": "", "grupo_cotizacion": "", "antiguedad": ""},
-                            "periodo": {"fecha_inicio": "", "fecha_fin": "", "total_dias": ""},
-                            "devengos": [{"concepto": "", "importe": ""}],
-                            "deducciones": [{"concepto": "", "importe": ""}],
-                            "totales": {"total_devengado": "", "total_deducir": "", "liquido_total": ""},
-                            "bases_cotizacion": {"contingencias_comunes": "", "at_y_ep": "", "irpf": ""}
-                        }',
+                            'text' => 'Extrae toda la información de esta nómina siguiendo exactamente esta estructura JSON.
+
+REGLAS DE FORMATO:
+1. FECHAS: Todas las fechas en formato d/m/Y (ej: 01/01/2026).
+2. PORCENTAJES: En el array de "deducciones", añade el campo "porcentaje". Debe ser un número decimal usando la COMA como separador (ej: "4,70"). Si un concepto no tiene porcentaje, devuelve "".
+3. IMPORTES: Usa siempre la coma para los decimales en todos los campos numéricos.
+
+Estructura:
+{
+    "empresa": {"nombre": "", "cif": "", "ccc": ""},
+    "trabajador": {"nombre": "", "dni": "", "naf": "", "grupo_cotizacion": "", "antiguedad": ""},
+    "periodo": {"fecha_inicio": "", "fecha_fin": "", "total_dias": ""},
+    "devengos": [{"concepto": "", "importe": ""}],
+    "deducciones": [{"concepto": "", "importe": "", "porcentaje": ""}],
+    "totales": {"total_devengado": "", "total_deducir": "", "liquido_total": ""},
+    "bases_cotizacion": {"contingencias_comunes": "", "at_y_ep": "", "irpf": ""}
+}',
                         ],
                         [
                             'type' => 'image_url',

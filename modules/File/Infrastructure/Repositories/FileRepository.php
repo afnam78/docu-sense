@@ -2,6 +2,7 @@
 
 namespace Modules\File\Infrastructure\Repositories;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Modules\File\Domain\Contracts\FileRepositoryInterface;
 use Modules\File\Domain\Entities\File;
@@ -22,7 +23,9 @@ class FileRepository implements FileRepositoryInterface
                 hash: $file->hash,
                 mimeType: $file->mimetype,
                 status: StatusEnum::from($file->status),
-                jsonResponse: $file->json_response
+                jsonResponse: $file->json_response ? json_decode($file->json_response, true) : [],
+                payslipResponse: $file->payslip_response ? json_decode($file->payslip_response, true) : [],
+                analyzeDate: $file->analyze_date ? Carbon::createFromFormat('Y-m-d H:i:s', $file->analyze_date) : null,
             );
         } catch (\Exception $e) {
             Log::error('File Repository Error: find method '.$e->getMessage());
@@ -49,7 +52,10 @@ class FileRepository implements FileRepositoryInterface
                 hash: $file->hash,
                 mimeType: $file->mimetype,
                 status: StatusEnum::from($file->status),
-                name: $file->aliases->first()->name
+                name: $file->aliases->first()->name,
+                jsonResponse: $file->json_response ? json_decode($file->json_response, true) : [],
+                payslipResponse: $file->payslip_response ? json_decode($file->payslip_response, true) : [],
+                analyzeDate: $file->analyze_date ? Carbon::createFromFormat('Y-m-d H:i:s', $file->analyze_date) : null,
             );
         } catch (\Exception $e) {
             Log::error('File Repository Error: findByHashAndTenant method '.$e->getMessage());
@@ -65,6 +71,9 @@ class FileRepository implements FileRepositoryInterface
                 'hash' => $file->hash(),
                 'mimetype' => $file->mimeType(),
                 'status' => $file->status()->value,
+                'json_response' => json_encode($file->jsonResponse()),
+                'payslip_response' => json_encode($file->payslipResponse()),
+                'analyze_date' => $file->analyzeDate(),
             ]);
 
         } catch (\Exception $e) {
@@ -118,8 +127,9 @@ class FileRepository implements FileRepositoryInterface
             \Modules\File\Infrastructure\Databases\Models\File::where('hash', $file->hash())->update([
                 'mimetype' => $file->mimeType(),
                 'status' => $file->status()->value,
-                'json_response' => $file->jsonResponse(),
-                'payslip_response' => $file->payslipResponse(),
+                'json_response' => $file->jsonResponse() ? json_encode($file->jsonResponse()) : null,
+                'payslip_response' => $file->payslipResponse() ? json_encode($file->payslipResponse()) : null,
+                'analyze_date' => $file->analyzeDate(),
             ]);
         } catch (\Exception $e) {
             Log::error('File Repository Error: update method '.$e->getMessage());

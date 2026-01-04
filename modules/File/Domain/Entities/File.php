@@ -2,6 +2,7 @@
 
 namespace Modules\File\Domain\Entities;
 
+use Illuminate\Support\Carbon;
 use Modules\File\Domain\Enums\StatusEnum;
 
 final class File
@@ -12,8 +13,9 @@ final class File
         private StatusEnum $status,
         private ?string $base64 = null,
         private ?string $name = null,
-        private ?string $jsonResponse = null,
+        private array $jsonResponse = [],
         private array $payslipResponse = [],
+        private ?Carbon $analyzeDate = null
     ) {}
 
     public function hash(): string
@@ -36,7 +38,7 @@ final class File
         return $this->base64;
     }
 
-    public function jsonResponse(): ?string
+    public function jsonResponse(): array
     {
         return $this->jsonResponse;
     }
@@ -61,8 +63,18 @@ final class File
         $this->payslipResponse = $payslipResponse;
     }
 
-    public function setJsonResponse(string $result): void
+    public function setJsonResponse(array $result): void
     {
         $this->jsonResponse = $result;
+    }
+
+    public function analyzeDate(): ?Carbon
+    {
+        return $this->analyzeDate;
+    }
+
+    public function setAnalyzeDate(Carbon $analyzeDate): void
+    {
+        $this->analyzeDate = $analyzeDate;
     }
 }
