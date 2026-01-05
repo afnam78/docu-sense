@@ -21,7 +21,7 @@ final readonly class TotalDTO
 
     public static function fromObject(Total $totals): self
     {
-        return new self($totals->net(), $totals->taxes(), $totals->total());
+        return new self($totals->net()->toDecimal(), $totals->taxes()->toDecimal(), $totals->total()->toDecimal());
     }
 
     public function toArray(): array

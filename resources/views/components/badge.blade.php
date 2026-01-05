@@ -13,6 +13,6 @@
     $classes = $styles[$type] ?? $styles['info'];
 @endphp
 
-<span {{ $attributes->merge(['class' => "$classes border rounded text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm"]) }}>
+<span {{ $attributes->merge(['class' => "$classes border rounded text-xs font-medium px-2.5 py-0.5 rounded-sm"]) }}>
     {{ $slot }}
 </span>

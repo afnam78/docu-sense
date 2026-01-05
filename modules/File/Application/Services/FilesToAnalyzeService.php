@@ -11,6 +11,7 @@ use Modules\File\Domain\Entities\File;
 use Modules\File\Domain\Enums\StatusEnum;
 use Modules\File\Infrastructure\Jobs\AnalyzeFileJob;
 use Spatie\PdfToImage\Pdf;
+use thiagoalessio\TesseractOCR\TesseractOCR;
 
 final readonly class FilesToAnalyzeService implements FilesToAnalyzeServiceInterface
 {
@@ -50,7 +51,16 @@ final readonly class FilesToAnalyzeService implements FilesToAnalyzeServiceInter
         $mimeType = \Illuminate\Support\Facades\File::mimeType($file->getRealPath());
         $base64Image = "data:{$mimeType};base64,".$entity->base64();
 
-        return new AnalyzeFileJob($entity->hash(), $base64Image, auth()->user()->id);
+        $ocrText = (new TesseractOCR($file->getRealPath()))
+            ->lang('spa')
+            ->run();
+
+        $hocrData = (new TesseractOCR($file->getRealPath()))
+            ->lang('spa')
+            ->hocr()
+            ->run();
+
+        return new AnalyzeFileJob($entity->hash(), $base64Image, auth()->user()->id, $ocrText, $hocrData);
     }
 
     private function managePdfFiles(TemporaryUploadedFile $file, string $hash): AnalyzeFileJob
@@ -69,13 +79,22 @@ final readonly class FilesToAnalyzeService implements FilesToAnalyzeServiceInter
             $base64 = base64_encode($fileContent);
             $mimeType = \Illuminate\Support\Facades\File::mimeType($path);
             $base64String = "data:{$mimeType};base64,{$base64}";
-            Storage::delete($path);
 
+            $ocrText = (new TesseractOCR($path))
+                ->lang('spa')
+                ->run();
+
+            $hocrData = (new TesseractOCR($path))
+                ->lang('spa')
+                ->hocr()
+                ->run();
+
+            Storage::delete($path);
         } else {
             throw new \Exception('File not found');
         }
 
-        return new AnalyzeFileJob($hash, $base64String, auth()->user()->id);
+        return new AnalyzeFileJob($hash, $base64String, auth()->user()->id, $ocrText, $hocrData);
     }
 
     private function createAndAddAlias(string $hash, TemporaryUploadedFile $file): File

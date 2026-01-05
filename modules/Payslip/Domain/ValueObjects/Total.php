@@ -2,32 +2,34 @@
 
 namespace Modules\Payslip\Domain\ValueObjects;
 
+use Modules\Shared\Domain\ValueObjects\Money;
+
 class Total
 {
-    private float $net;
+    private Money $net;
 
-    private float $taxes;
+    private Money $taxes;
 
-    private float $total;
+    private Money $total;
 
-    public function __construct(float $net, float $taxes, float $total)
+    public function __construct(Money $net, Money $taxes, Money $total)
     {
         $this->net = $net;
         $this->taxes = $taxes;
         $this->total = $total;
     }
 
-    public function net(): float
+    public function net(): Money
     {
         return $this->net;
     }
 
-    public function taxes(): float
+    public function taxes(): Money
     {
         return $this->taxes;
     }
 
-    public function total(): float
+    public function total(): Money
     {
         return $this->total;
     }

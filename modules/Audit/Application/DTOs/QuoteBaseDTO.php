@@ -21,7 +21,7 @@ final readonly class QuoteBaseDTO
 
     public static function fromObject(QuoteBase $quoteBase): self
     {
-        return new self($quoteBase->irpf(), $quoteBase->professionalContingencies(), $quoteBase->commonContingencies());
+        return new self($quoteBase->irpf()->toDecimal(), $quoteBase->professionalContingencies()->toDecimal(), $quoteBase->commonContingencies()->toDecimal());
     }
 
     public function toArray(): array

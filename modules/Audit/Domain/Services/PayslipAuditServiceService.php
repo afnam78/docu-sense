@@ -3,8 +3,8 @@
 namespace Modules\Audit\Domain\Services;
 
 use Modules\Audit\Domain\Contracts\ArithmeticCoherenceInterface;
-use Modules\Audit\Domain\Contracts\PayslipAuditServiceInterface;
 use Modules\Audit\Domain\Contracts\HeuristicIntegrityInterface;
+use Modules\Audit\Domain\Contracts\PayslipAuditServiceInterface;
 use Modules\Audit\Domain\Contracts\SocialSecurityCoherenceInterface;
 use Modules\Audit\Domain\Entities\Audit;
 use Modules\Payslip\Domain\Entities\Payslip;

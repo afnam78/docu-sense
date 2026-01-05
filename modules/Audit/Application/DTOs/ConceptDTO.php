@@ -21,7 +21,7 @@ final class ConceptDTO
 
     public static function fromObject(Concept $concept): self
     {
-        return new self($concept->amount(), $concept->concept(), $concept->percentage());
+        return new self($concept->amount()->toDecimal(), $concept->concept(), $concept->percentage());
     }
 
     public function toString(): string

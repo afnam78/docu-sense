@@ -32,15 +32,15 @@
 
                             <div class="space-y-4">
                                 @include('audit::partials.audit-message-stack', [
-                                'title' => 'Cálculo aritmético',
+                                'title' => 'Integridad de Datos Aritméticos',
                                 'items' => $arithmeticCoherence,
                             ])
                                 @include('audit::partials.audit-message-stack', [
-                              'title' => 'Seguridad social',
+                              'title' => 'Coherencia Normativa (Fiscal/SS)',
                               'items' => $socialSecurityCoherence,
                           ])
                                 @include('audit::partials.audit-message-stack', [
-                              'title' => 'Heurísticas de estructura',
+                              'title' => 'Smart Check: Heurísticas de Confianza',
                               'items' => $heuristicIntegrity,
                           ])
                             </div>

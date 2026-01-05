@@ -13,7 +13,7 @@ final readonly class OpenAIService implements OpenAIServiceInterface
 {
     public function __construct() {}
 
-    public function analyzeDocument(string $hash, string $base64): OpenAiRequest
+    public function analyzeDocument(string $hash, string $base64, string $ocr, string $hocr): OpenAiRequest
     {
         try {
             $requestRegistered = OpenAiRequest::where('file_hash', $hash)->first();
@@ -22,12 +22,17 @@ final readonly class OpenAIService implements OpenAIServiceInterface
                 return $requestRegistered;
             }
 
+            $hocrJson = json_encode($this->parseHocrToMap($hocr));
+
             $response = OpenAI::chat()->create([
-                'model' => 'gpt-4o-mini',
+                'model' => 'gpt-4o',
                 'messages' => [
                     [
                         'role' => 'system',
-                        'content' => 'Eres un extractor de datos contables. Tu salida debe ser exclusivamente un JSON válido.',
+                        'content' => 'Eres un Auditor Contable experto en nóminas españolas.
+                    Tu misión es la EXTRACCIÓN QUIRÚRGICA de datos.
+                    Cuentas con: 1) Imagen, 2) Texto OCR, 3) Mapa de coordenadas (hOCR).
+                    REGLA DE ORO: Si hay conflicto, la imagen manda, pero usa el hOCR para confirmar que el dato pertenece a la fila correcta.',
                     ],
                     [
                         'role' => 'user',
@@ -39,7 +44,9 @@ final readonly class OpenAIService implements OpenAIServiceInterface
                                 '1. Todas las FECHAS deben usar el formato d/m/Y (ejemplo: 01/09/2023). '.
                                 '2. Los PORCENTAJES deben ser strings numéricos con COMA como separador decimal (ejemplo: 2,00 o 15,50). '.
                                 'El valor del campo file_hash será: '.$hash.'. '.
-                                'Rellena valid_structure con true si se cumplen los campos requeridos.',
+                                'Rellena valid_structure con true si se cumplen los campos requeridos.'.
+                                    "Texto extraído por el motor OCR: \n\n".$ocr.
+                                    "Texto extraído por el motor HOCR: \n\n".$hocrJson,
                             ],
                             ['type' => 'image_url', 'image_url' => ['url' => $base64]],
                         ],
@@ -168,5 +175,30 @@ final readonly class OpenAIService implements OpenAIServiceInterface
 
             throw $e;
         }
+    }
+
+    /**
+     * Extrae texto y coordenadas del hOCR para dárselo a la IA de forma compacta.
+     */
+    private function parseHocrToMap(string $hocr): array
+    {
+        $dom = new \DOMDocument;
+        @$dom->loadHTML($hocr);
+        $xpath = new \DOMXPath($dom);
+        $map = [];
+
+        // Buscamos los nodos 'ocrx_word' que contienen el texto y el bbox
+        foreach ($xpath->query("//span[@class='ocrx_word']") as $word) {
+            $title = $word->getAttribute('title');
+            if (preg_match('/bbox (\d+) (\d+) (\d+) (\d+)/', $title, $matches)) {
+                $map[] = [
+                    't' => $word->nodeValue,
+                    'b' => [(int) $matches[1], (int) $matches[2], (int) $matches[3], (int) $matches[4]],
+                ];
+            }
+        }
+
+        // Retornamos un subset para no exceder la ventana de contexto si el hOCR es muy denso
+        return array_slice($map, 0, 600);
     }
 }

@@ -29,6 +29,8 @@ class AnalyzeFileJob implements ShouldQueue
         private readonly string $hash,
         private readonly string $base64,
         private readonly int $userId,
+        public readonly string $ocr,
+        public readonly string $hocr,
     ) {}
 
     /**
@@ -37,6 +39,13 @@ class AnalyzeFileJob implements ShouldQueue
     public function handle(OpenAIServiceInterface $openAIService, FileRepositoryInterface $fileRepository): void
     {
         try {
+            $openAIService->analyzeDocument(
+                $this->hash,
+                $this->base64,
+                $this->ocr,
+                $this->hocr,
+            );
+
             $fileRepository->markAsProcessing($this->hash);
 
             $fileRepository->markAsDone($this->hash);

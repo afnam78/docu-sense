@@ -2,32 +2,34 @@
 
 namespace Modules\Payslip\Domain\ValueObjects;
 
+use Modules\Shared\Domain\ValueObjects\Money;
+
 class QuoteBase
 {
-    private float $irpf;
+    private Money $irpf;
 
-    private float $professionalContingencies;
+    private Money $professionalContingencies;
 
-    private float $commonContingencies;
+    private Money $commonContingencies;
 
-    public function __construct(float $irpf, float $professionalContingencies, float $commonContingencies)
+    public function __construct(Money $irpf, Money $professionalContingencies, Money $commonContingencies)
     {
         $this->irpf = $irpf;
         $this->professionalContingencies = $professionalContingencies;
         $this->commonContingencies = $commonContingencies;
     }
 
-    public function irpf(): float
+    public function irpf(): Money
     {
         return $this->irpf;
     }
 
-    public function professionalContingencies(): float
+    public function professionalContingencies(): Money
     {
         return $this->professionalContingencies;
     }
 
-    public function commonContingencies(): float
+    public function commonContingencies(): Money
     {
         return $this->commonContingencies;
     }

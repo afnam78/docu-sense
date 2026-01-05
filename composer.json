@@ -16,7 +16,9 @@
         "masmerise/livewire-toaster": "^2.8",
         "openai-php/laravel": "^0.18.0",
         "saloonphp/saloon": "3.0",
-        "spatie/pdf-to-image": "^3.1"
+        "spatie/pdf-to-image": "^3.1",
+        "thiagoalessio/tesseract_ocr": "^2.13",
+        "ext-dom": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

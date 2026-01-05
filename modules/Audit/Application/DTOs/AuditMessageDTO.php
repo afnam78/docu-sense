@@ -27,7 +27,7 @@ final readonly class AuditMessageDTO
         return [
             'message' => $this->message,
             'status' => $this->status,
-            'title' => $this->title,
+            'title' => str($this->title)->limit(60),
         ];
     }
 }

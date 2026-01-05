@@ -12,13 +12,12 @@ final readonly class SocialSecurityCoherence implements SocialSecurityCoherenceI
 {
     public function execute(Payslip $payslip): array
     {
-        $baseCC = $payslip->quoteBase()->commonContingencies();
+        $baseCC = $payslip->quoteBase()->commonContingencies()->amount();
+        $audits = [];
 
         /**
          * @var Concept $deduction
          */
-        $incoherence = [];
-
         foreach ($payslip->deductions() as $deduction) {
             $percentage = $deduction->percentage();
 
@@ -26,18 +25,30 @@ final readonly class SocialSecurityCoherence implements SocialSecurityCoherenceI
                 continue;
             }
 
-            $calculatedAmount = $baseCC * $percentage / 100;
-            $extractedAmount = $deduction->amount();
+            $calculatedAmountCents = $baseCC * $percentage / 100;
+            $extractedAmountCents = $deduction->amount()->amount();
 
-            if (abs($calculatedAmount - $extractedAmount) > 0.02) {
-                $incoherence[] = new AuditMessage(
+            $diff = abs(round($calculatedAmountCents) - $extractedAmountCents);
+
+            if ($diff > 2) {
+                $audits[] = new AuditMessage(
                     status: StatusEnum::WARNING,
-                    title: $deduction->concept(),
-                    message: "Inconsistencia en la deducción {$deduction->concept()}: monto extraído {$extractedAmount}, monto calculado {$calculatedAmount}"
+                    title: "Desviación en {$deduction->concept()}",
+                    message: sprintf(
+                        'Se esperaba una retención de %.2f€ (%s%% de la base), pero se extrajo %.2f€. Posible error de cálculo en origen o manipulación.',
+                        $calculatedAmountCents / 100,
+                        number_format($percentage, 2, ',', '.'),
+                        $extractedAmountCents / 100
+                    )
+                );
+            } else {
+                $audits[] = new AuditMessage(
+                    status: StatusEnum::OK,
+                    title: "Verificación correcta de {$deduction->concept()}",
                 );
             }
         }
 
-        return $incoherence;
+        return $audits;
     }
 }

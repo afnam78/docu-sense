@@ -3,6 +3,7 @@
 namespace Modules\Payslip\Domain\Mappers;
 
 use Modules\Payslip\Domain\ValueObjects\QuoteBase;
+use Modules\Shared\Domain\ValueObjects\Money;
 
 class QuoteBaseMapper
 {
@@ -13,9 +14,9 @@ class QuoteBaseMapper
         $commonContingencies = data_get($data, 'contingencias_comunes');
 
         return new QuoteBase(
-            irpf: (float) str_replace(',', '.', $irpf ?? ''),
-            professionalContingencies: (float) str_replace(',', '.', $professionalContingencies ?? ''),
-            commonContingencies: (float) str_replace(',', '.', $commonContingencies ?? ''),
+            irpf: new Money((float) str_replace(',', '.', $irpf ?? '')),
+            professionalContingencies: new Money((float) str_replace(',', '.', $professionalContingencies ?? '')),
+            commonContingencies: new Money((float) str_replace(',', '.', $commonContingencies ?? '')),
         );
     }
 }

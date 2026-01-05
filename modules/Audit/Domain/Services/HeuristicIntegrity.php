@@ -20,30 +20,40 @@ final readonly class HeuristicIntegrity implements HeuristicIntegrityInterface
 
     private function nifValidations(Payslip $payslip): array
     {
-        $incoherence = [];
+        $audits = [];
 
         $employee = $payslip->worker();
 
         if (! NIF::isValidDniOrNie($employee->nif())) {
-            $incoherence[] = new AuditMessage(
+            $audits[] = new AuditMessage(
                 status: StatusEnum::CRITICAL,
-                title: 'NIF del empleado inválido'
+                title: 'NIF mal formado'
+            );
+        } else {
+            $audits[] = new AuditMessage(
+                status: StatusEnum::INFO,
+                title: 'Formato de NIF correcto. (no se comprueba su validez)'
             );
         }
 
         if (! NIF::isValidCIF($payslip->company()->cif())) {
-            $incoherence[] = new AuditMessage(
+            $audits[] = new AuditMessage(
                 status: StatusEnum::CRITICAL,
                 title: 'CIF de la empresa inválido'
             );
+        } else {
+            $audits[] = new AuditMessage(
+                status: StatusEnum::INFO,
+                title: 'Formato de CIF correcto. (no se comprueba su validez)'
+            );
         }
 
-        return $incoherence;
+        return $audits;
     }
 
     private function temporalSanity(Payslip $payslip): array
     {
-        $incoherence = [];
+        $audit = [];
 
         $period = $payslip->period();
         $startDate = $period->startDate();
@@ -55,26 +65,44 @@ final readonly class HeuristicIntegrity implements HeuristicIntegrityInterface
             return [
                 new AuditMessage(
                     status: StatusEnum::CRITICAL,
+                    title: 'Incoherencia en fechas del período',
                     message: 'La fecha de inicio del período es posterior a la fecha de fin'
                 ),
             ];
+        } else {
+            $audit[] = new AuditMessage(
+                status: StatusEnum::OK,
+                title: 'Fechas del período coherentes'
+            );
         }
 
         if ($endDate->greaterThan(now()->addMonth())) {
-            $incoherence[] = new AuditMessage(
+            $audit[] = new AuditMessage(
                 status: StatusEnum::WARNING,
+                title: 'Fecha futura detectada',
                 message: 'La nómina indica una fecha futura. Posible error de lectura.'
+            );
+        } else {
+            $audit[] = new AuditMessage(
+                status: StatusEnum::OK,
+                title: 'Fecha del período dentro de rango esperado'
             );
         }
 
         $calendarDays = $startDate->diffInDays($endDate) + 1;
         if ($extractedDays !== 30 && $extractedDays !== $calendarDays) {
-            $incoherence[] = new AuditMessage(
+            $audit[] = new AuditMessage(
                 status: StatusEnum::WARNING,
+                title: 'Incoherencia en días del período',
                 message: "Los días extraídos ({$extractedDays}) no coinciden con el calendario ({$calendarDays})."
+            );
+        } else {
+            $audit[] = new AuditMessage(
+                status: StatusEnum::OK,
+                title: 'Días del período coherentes'
             );
         }
 
-        return $incoherence;
+        return $audit;
     }
 }

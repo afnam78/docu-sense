@@ -2,22 +2,24 @@
 
 namespace Modules\Payslip\Domain\ValueObjects;
 
+use Modules\Shared\Domain\ValueObjects\Money;
+
 class Concept
 {
-    private float $amount;
+    private Money $amount;
 
     private string $concept;
 
     private float $percentage;
 
-    public function __construct(float $amount, string $concept, float $percentage)
+    public function __construct(Money $amount, string $concept, float $percentage)
     {
         $this->amount = $amount;
         $this->concept = $concept;
         $this->percentage = $percentage;
     }
 
-    public function amount(): float
+    public function amount(): Money
     {
         return $this->amount;
     }
