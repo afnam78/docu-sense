@@ -5,7 +5,7 @@ namespace Modules\Audit\Domain\Contracts;
 use Modules\Audit\Domain\Entities\Audit;
 use Modules\Payslip\Domain\Entities\Payslip;
 
-interface AuditServiceInterface
+interface PayslipAuditServiceInterface
 {
-    public function execute(Payslip $payslip): Audit;
+    public function generate(Payslip $payslip): Audit;
 }

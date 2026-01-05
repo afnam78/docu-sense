@@ -4,11 +4,11 @@ namespace Modules\Payslip\Domain\ValueObjects;
 
 class Total
 {
-    public float $net;
+    private float $net;
 
-    public float $taxes;
+    private float $taxes;
 
-    public float $total;
+    private float $total;
 
     public function __construct(float $net, float $taxes, float $total)
     {

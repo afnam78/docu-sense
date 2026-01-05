@@ -39,10 +39,12 @@
                             @foreach($files as $file)
                                 <tr class="bg-white border-b border-gray-200 hover:bg-gray-50 ">
                                     <td class="px-6 py-4">
-                                        <a href="{{ route('audit.detail', $file->file_hash) }}"
-                                           class="font-medium text-blue-600 hover:underline">
-                                            Ver
-                                        </a>
+                                        @if($file->file->request)
+                                            <a href="{{ route('audit.detail', $file->file_hash) }}"
+                                               class="font-medium text-blue-600 hover:underline">
+                                                Ver
+                                            </a>
+                                        @endif
                                     </td>
                                     <th scope="row"
                                         class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
@@ -61,7 +63,7 @@
                                     </td>
                                     <td class="py-4 flex justify-center">
                                         @if($file->file->status === StatusEnum::DONE->value )
-                                            @if($file->file->request->valid_structure)
+                                            @if($file->file->request?->valid_structure)
                                                 <x-check class="size-5 text-green-600"/>
                                             @else
                                                 <x-x-circle class="size-5 text-red-500"/>

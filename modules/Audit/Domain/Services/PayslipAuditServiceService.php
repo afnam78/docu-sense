@@ -3,13 +3,13 @@
 namespace Modules\Audit\Domain\Services;
 
 use Modules\Audit\Domain\Contracts\ArithmeticCoherenceInterface;
-use Modules\Audit\Domain\Contracts\AuditServiceInterface;
+use Modules\Audit\Domain\Contracts\PayslipAuditServiceInterface;
 use Modules\Audit\Domain\Contracts\HeuristicIntegrityInterface;
 use Modules\Audit\Domain\Contracts\SocialSecurityCoherenceInterface;
 use Modules\Audit\Domain\Entities\Audit;
 use Modules\Payslip\Domain\Entities\Payslip;
 
-final readonly class AuditServiceService implements AuditServiceInterface
+final readonly class PayslipAuditServiceService implements PayslipAuditServiceInterface
 {
     public function __construct(
         private ArithmeticCoherenceInterface $arithmeticCoherence,
@@ -17,7 +17,7 @@ final readonly class AuditServiceService implements AuditServiceInterface
         private HeuristicIntegrityInterface $heuristicIntegrity,
     ) {}
 
-    public function execute(Payslip $payslip): Audit
+    public function generate(Payslip $payslip): Audit
     {
         $arithmeticConsistency = $this->arithmeticCoherence->execute($payslip);
         $socialSecurityCoherence = $this->socialSecurityCoherence->execute($payslip);

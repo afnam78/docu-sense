@@ -18,6 +18,10 @@ class AuditDetail extends Component
 
     public string $hash;
 
+    public array $payslip;
+
+    public string $fileName;
+
     public function render()
     {
         return view('audit::livewire.audit-detail');
@@ -28,11 +32,15 @@ class AuditDetail extends Component
         try {
             $this->hash = $hash;
             $command = new FindAuditCommand($hash);
-            $audit = $useCase->handle($command)->audit->toArray();
+            $result = $useCase->handle($command);
 
-            $this->arithmeticCoherence = $audit['arithmetic_coherence'];
-            $this->socialSecurityCoherence = $audit['social_security_coherence'];
-            $this->heuristicIntegrity = $audit['heuristic_integrity'];
+            $this->fileName = $result->fileName;
+            $audit = $result->audit->toArray();
+            $this->payslip = $result->payslip->toArray();
+
+            $this->arithmeticCoherence = data_get($audit, 'arithmetic_coherence', []);
+            $this->socialSecurityCoherence = data_get($audit, 'social_security_coherence', []);
+            $this->heuristicIntegrity = data_get($audit, 'heuristic_integrity', []);
         } catch (AuditNotFound $e) {
             abort(404, 'Audit not found.');
         } catch (\Exception $e) {
