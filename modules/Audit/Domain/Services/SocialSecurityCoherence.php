@@ -32,6 +32,7 @@ final readonly class SocialSecurityCoherence implements SocialSecurityCoherenceI
             if (abs($calculatedAmount - $extractedAmount) > 0.02) {
                 $incoherence[] = new AuditMessage(
                     status: StatusEnum::WARNING,
+                    title: $deduction->concept(),
                     message: "Inconsistencia en la deducción {$deduction->concept()}: monto extraído {$extractedAmount}, monto calculado {$calculatedAmount}"
                 );
             }

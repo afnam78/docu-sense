@@ -20,7 +20,7 @@ final readonly class ArithmeticCoherence implements ArithmeticCoherenceInterface
         if ($accrualSum !== $extractedAccrualSum) {
             $incoherence[] = new AuditMessage(
                 status: StatusEnum::CRITICAL,
-                message: 'Cálculo incorrecto de devengos'
+                title: 'Cálculo incorrecto de devengos'
             );
         }
 
@@ -30,7 +30,7 @@ final readonly class ArithmeticCoherence implements ArithmeticCoherenceInterface
         if ($deductionSum !== $extractedDeductionSum) {
             $incoherence[] = new AuditMessage(
                 status: StatusEnum::CRITICAL,
-                message: 'Cálculo incorrecto de deducciones'
+                title: 'Cálculo incorrecto de deducciones'
             );
         }
 
@@ -40,7 +40,7 @@ final readonly class ArithmeticCoherence implements ArithmeticCoherenceInterface
         if ($netTotal !== $extractedNetTotal) {
             $incoherence[] = new AuditMessage(
                 status: StatusEnum::CRITICAL,
-                message: 'Cálculo incorrecto del total neto'
+                title: 'Cálculo incorrecto del total neto'
             );
         }
 

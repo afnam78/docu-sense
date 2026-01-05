@@ -5,7 +5,7 @@
             @php($statusEnum = $item['status'])
             <div class="block">
                 <x-badge type="{{$statusEnum->badge()}}">
-                    {{$item['message']}}
+                    {{$item['title']}}
                 </x-badge>
             </div>
         @empty

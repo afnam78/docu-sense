@@ -11,6 +11,7 @@ class AuditMessageMapper
     {
         return new AuditMessage(
             status: StatusEnum::from($data['status']),
+            title: $data['title'],
             message: $data['message'],
         );
     }

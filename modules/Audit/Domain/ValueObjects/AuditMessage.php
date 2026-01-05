@@ -8,7 +8,8 @@ final readonly class AuditMessage
 {
     public function __construct(
         private StatusEnum $status,
-        private string $message,
+        private string $title,
+        private ?string $message = null,
     ) {}
 
     public function status(): StatusEnum
@@ -16,7 +17,12 @@ final readonly class AuditMessage
         return $this->status;
     }
 
-    public function message(): string
+    public function title(): string
+    {
+        return $this->title;
+    }
+
+    public function message(): ?string
     {
         return $this->message;
     }
@@ -25,6 +31,7 @@ final readonly class AuditMessage
     {
         return [
             'status' => $this->status->value,
+            'title' => $this->title,
             'message' => $this->message,
         ];
     }

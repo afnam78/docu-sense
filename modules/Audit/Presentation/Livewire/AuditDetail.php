@@ -16,6 +16,8 @@ class AuditDetail extends Component
 
     public array $heuristicIntegrity;
 
+    public string $hash;
+
     public function render()
     {
         return view('audit::livewire.audit-detail');
@@ -24,6 +26,7 @@ class AuditDetail extends Component
     public function mount(string $hash, FindAuditUseCase $useCase): void
     {
         try {
+            $this->hash = $hash;
             $command = new FindAuditCommand($hash);
             $audit = $useCase->handle($command)->audit->toArray();
 

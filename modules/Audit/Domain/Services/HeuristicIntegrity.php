@@ -27,14 +27,14 @@ final readonly class HeuristicIntegrity implements HeuristicIntegrityInterface
         if (! NIF::isValidDniOrNie($employee->nif())) {
             $incoherence[] = new AuditMessage(
                 status: StatusEnum::CRITICAL,
-                message: 'NIF del empleado inválido'
+                title: 'NIF del empleado inválido'
             );
         }
 
         if (! NIF::isValidCIF($payslip->company()->cif())) {
             $incoherence[] = new AuditMessage(
                 status: StatusEnum::CRITICAL,
-                message: 'CIF de la empresa inválido'
+                title: 'CIF de la empresa inválido'
             );
         }
 

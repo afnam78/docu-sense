@@ -8,15 +8,17 @@ use Modules\Audit\Domain\ValueObjects\AuditMessage;
 final readonly class AuditMessageDTO
 {
     public function __construct(
-        public string $message,
         public StatusEnum $status,
+        public string $title,
+        public ?string $message,
     ) {}
 
     public static function fromObject(AuditMessage $object): self
     {
         return new self(
-            message: $object->message(),
             status: $object->status(),
+            title: $object->title(),
+            message: $object->message(),
         );
     }
 
@@ -25,6 +27,7 @@ final readonly class AuditMessageDTO
         return [
             'message' => $this->message,
             'status' => $this->status,
+            'title' => $this->title,
         ];
     }
 }
