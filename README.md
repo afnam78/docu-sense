@@ -1,59 +1,79 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# DocuSense v2.0 — AI Payroll Auditor & Discrepancy Engine
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+![Laravel 12](https://img.shields.io/badge/Framework-Laravel%2012-orange)
+![PHP 8.3](https://img.shields.io/badge/PHP-8.3-blue)
+![Policy](https://img.shields.io/badge/Policy-Zero--Storage-green)
+![Architecture](https://img.shields.io/badge/Architecture-DDD-red)
 
-## About Laravel
+## 🎯 Visión y Objetivo del Proyecto
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+**DocuSense** es una solución SaaS de infraestructura financiera especializada en la extracción, normalización y, fundamentalmente, **auditoría automatizada de nóminas**.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+A diferencia de los motores de OCR genéricos, DocuSense actúa como un **Auditor Contable Senior**. El objetivo central es mitigar el riesgo de fraude y error humano en procesos de validación de solvencia (como el scoring para seguros de impago o alquileres), garantizando que los datos extraídos sean no solo legibles, sino **matemáticamente íntegros y legalmente coherentes**.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 🛡️ Política Zero-Storage (Privacy by Design)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+DocuSense se fundamenta en la privacidad extrema:
+1. **Procesamiento en Caliente:** Los archivos se procesan en memoria (RAM) o directorios volátiles.
+2. **Identificación por Huella Digital:** Utilizamos el algoritmo **SHA-256** para generar un hash del contenido. Esto permite la deduplicación y el reconocimiento de archivos ya procesados sin necesidad de almacenar el original.
+3. **Destrucción Inmediata:** Tras la extracción y auditoría, el archivo origen se elimina permanentemente. Solo persistimos la "huella digital" y el resultado estructurado.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## 🏗️ Patrones de Diseño y Arquitectura
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+El sistema ha sido construido bajo los principios de **Clean Architecture** y **Domain-Driven Design (DDD)**:
 
-### Premium Partners
+* **Arquitectura Hexagonal:** Separación estricta entre el núcleo de negocio (Dominio) y los detalles técnicos (Infraestructura).
+* **Value Objects:** Implementación de objetos de valor para garantizar la integridad de NIFs y Fechas desde su construcción.
+* **Data Transfer Objects (DTOs):** Flujo de datos inmutable entre la IA (OpenAI) y los servicios de auditoría.
+* **Actions:** Encapsulación de la lógica de negocio (como el guardado final o la orquestación de la auditoría) en clases de responsabilidad única.
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+---
 
-## Contributing
+## 🧠 El Motor de Discrepancias (Audit Logic)
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+El corazón de DocuSense es su motor de auditoría de tres capas, diseñado para detectar desde errores de redondeo hasta manipulaciones fraudulentas:
 
-## Code of Conduct
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
 
-## Security Vulnerabilities
+* **Capa A (Integridad Aritmética):** Valida la ecuación fundamental de la nómina: `Total Devengado - Total Deducciones = Líquido Total`.
+* **Capa B (Coherencia Fiscal/SS):** Cruza las bases de cotización con los porcentajes legales extraídos (IRPF, Contingencias Comunes al 4.70%, MEI, etc.) para detectar inconsistencias tributarias.
+* **Capa C (Anti-Alucinación AI):** Heurística avanzada que valida formatos de NIF/CIF, verifica que las fechas de los periodos sean coherentes y detecta si la IA ha "inventado" datos basándose en patrones erróneos.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+---
 
-## License
+## 🚀 Stack Tecnológico
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+| Componente | Tecnología |
+| :--- | :--- |
+| **Framework** | Laravel 12 (PHP 8.3) |
+| **Frontend** | Stack **TALL** (Tailwind CSS, Alpine.js, Livewire 3) |
+| **IA Engine** | OpenAI Vision via **Saloon** (Structured Outputs) |
+| **Deduplicación** | SHA-256 Hashing |
+| **Procesamiento** | `spatie/pdf-to-image` para conversión en memoria |
+| **Base de Datos** | MySQL 8.0 con optimización de índices para hashes |
+
+---
+
+## 🖥️ Estado Actual del Desarrollo
+
+* ✅ **Pipeline de Extracción:** Integración funcional con OpenAI Vision para obtener JSON estructurado.
+* ✅ **Deduplicación Activa:** El sistema reconoce archivos duplicados y recupera auditorías previas mediante SHA-256.
+* ✅ **Servicio de Auditoría (H-A-C):** Motor de discrepancias implementado con lógica de capas A, B y C.
+* ✅ **Workbench de Validación:** Interfaz **Side-by-Side** en Livewire 3 que permite a los analistas comparar la extracción cruda frente a las alertas de auditoría en tiempo real.
+* ✅ **Zero-Storage:** Flujo de destrucción de archivos tras persistencia de datos.
+
+---
+
+## 🛠️ Próximos Pasos
+
+* [ ] **Detección Forense de PDF:** Análisis de metadatos para identificar si el archivo fue editado con software de diseño (Photoshop/Canva).
+* [ ] **Re-extracción Inteligente:** Capacidad de re-enviar secciones específicas a la IA si el motor de discrepancias detecta un error crítico.
+* [ ] **Exportación API:** Endpoint seguro para que sistemas externos (como SEAG) consuman la auditoría final.
+
+---
+
+> **DocuSense:** No solo leemos documentos, auditamos la realidad financiera.
