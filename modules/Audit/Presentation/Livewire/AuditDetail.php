@@ -16,6 +16,8 @@ class AuditDetail extends Component
 
     public array $heuristicIntegrity;
 
+    public array $fieldsSanity;
+
     public string $hash;
 
     public array $payslip;
@@ -41,9 +43,11 @@ class AuditDetail extends Component
             $this->arithmeticCoherence = data_get($audit, 'arithmetic_coherence', []);
             $this->socialSecurityCoherence = data_get($audit, 'social_security_coherence', []);
             $this->heuristicIntegrity = data_get($audit, 'heuristic_integrity', []);
+            $this->fieldsSanity = data_get($audit, 'fields_sanity', []);
         } catch (AuditNotFound $e) {
             abort(404, 'Audit not found.');
         } catch (\Exception $e) {
+            throw $e;
             Log::error('Error mounting AuditDetail component: '.$e->getMessage());
             abort(500, 'An error occurred while loading the audit details.');
         }

@@ -24,28 +24,32 @@ final readonly class HeuristicIntegrity implements HeuristicIntegrityInterface
 
         $employee = $payslip->worker();
 
-        if (! NIF::isValidDniOrNie($employee->nif())) {
-            $audits[] = new AuditMessage(
-                status: StatusEnum::CRITICAL,
-                title: 'NIF mal formado'
-            );
-        } else {
-            $audits[] = new AuditMessage(
-                status: StatusEnum::INFO,
-                title: 'Formato de NIF correcto. (no se comprueba su validez)'
-            );
+        if ($employee->nif()) {
+            if (! NIF::isValidDniOrNie($employee->nif())) {
+                $audits[] = new AuditMessage(
+                    status: StatusEnum::CRITICAL,
+                    title: 'NIF mal formado'
+                );
+            } else {
+                $audits[] = new AuditMessage(
+                    status: StatusEnum::INFO,
+                    title: 'Formato de NIF correcto. (no se comprueba su validez)'
+                );
+            }
         }
 
-        if (! NIF::isValidCIF($payslip->company()->cif())) {
-            $audits[] = new AuditMessage(
-                status: StatusEnum::CRITICAL,
-                title: 'CIF de la empresa inválido'
-            );
-        } else {
-            $audits[] = new AuditMessage(
-                status: StatusEnum::INFO,
-                title: 'Formato de CIF correcto. (no se comprueba su validez)'
-            );
+        if ($payslip->company()->cif()) {
+            if (! NIF::isValidCIF($payslip->company()->cif())) {
+                $audits[] = new AuditMessage(
+                    status: StatusEnum::CRITICAL,
+                    title: 'CIF de la empresa inválido'
+                );
+            } else {
+                $audits[] = new AuditMessage(
+                    status: StatusEnum::INFO,
+                    title: 'Formato de CIF correcto. (no se comprueba su validez)'
+                );
+            }
         }
 
         return $audits;
@@ -59,6 +63,10 @@ final readonly class HeuristicIntegrity implements HeuristicIntegrityInterface
         $startDate = $period->startDate();
         $endDate = $period->endDate();
         $extractedDays = $period->totalDays();
+
+        if (! $startDate || ! $endDate) {
+            return [];
+        }
 
         if ($startDate->greaterThan($endDate)) {
 

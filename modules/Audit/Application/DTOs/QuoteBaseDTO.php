@@ -6,13 +6,13 @@ use Modules\Payslip\Domain\ValueObjects\QuoteBase;
 
 final readonly class QuoteBaseDTO
 {
-    public float $irpf;
+    public ?float $irpf;
 
-    public float $professionalContingencies;
+    public ?float $professionalContingencies;
 
-    public float $commonContingencies;
+    public ?float $commonContingencies;
 
-    public function __construct(float $irpf, float $professionalContingencies, float $commonContingencies)
+    public function __construct(?float $irpf, ?float $professionalContingencies, ?float $commonContingencies)
     {
         $this->irpf = $irpf;
         $this->professionalContingencies = $professionalContingencies;

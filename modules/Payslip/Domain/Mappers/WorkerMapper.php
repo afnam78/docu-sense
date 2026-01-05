@@ -12,11 +12,11 @@ class WorkerMapper
         $seniorityDate = data_get($data, 'antiguedad');
 
         return new Worker(
-            name: data_get($data, 'nombre', ''),
-            nif: data_get($data, 'dni', ''),
-            ccc: data_get($data, 'naf', ''),
-            seniorityDate: Carbon::createFromFormat('d/m/Y', $seniorityDate),
-            quotationGroup: data_get($data, 'grupo_cotizacion', ''),
+            name: data_get($data, 'nombre'),
+            nif: data_get($data, 'dni'),
+            ccc: data_get($data, 'naf'),
+            seniorityDate: $seniorityDate ? Carbon::createFromFormat('d/m/Y', $seniorityDate) : null,
+            quotationGroup: data_get($data, 'grupo_cotizacion'),
         );
     }
 }

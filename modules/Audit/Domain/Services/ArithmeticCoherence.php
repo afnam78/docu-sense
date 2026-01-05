@@ -15,7 +15,7 @@ final readonly class ArithmeticCoherence implements ArithmeticCoherenceInterface
         $audits = [];
 
         $accrualSum = collect($payslip->accruals())->sum(fn (Concept $item) => $item->amount()->amount());
-        $extractedAccrualSum = $payslip->totals()->net()->amount();
+        $extractedAccrualSum = $payslip->totals()->net()?->amount();
 
         if ($accrualSum !== $extractedAccrualSum) {
             $audits[] = new AuditMessage(
@@ -30,7 +30,7 @@ final readonly class ArithmeticCoherence implements ArithmeticCoherenceInterface
         }
 
         $deductionSum = collect($payslip->deductions())->sum(fn (Concept $item) => $item->amount()->amount());
-        $extractedDeductionSum = $payslip->totals()->taxes()->amount();
+        $extractedDeductionSum = $payslip->totals()->taxes()?->amount();
 
         if ($deductionSum !== $extractedDeductionSum) {
             $audits[] = new AuditMessage(
@@ -45,7 +45,7 @@ final readonly class ArithmeticCoherence implements ArithmeticCoherenceInterface
         }
 
         $netTotal = ($accrualSum - $deductionSum);
-        $extractedNetTotal = $payslip->totals()->total()->amount();
+        $extractedNetTotal = $payslip->totals()->total()?->amount();
 
         if ($netTotal !== $extractedNetTotal) {
             $audits[] = new AuditMessage(

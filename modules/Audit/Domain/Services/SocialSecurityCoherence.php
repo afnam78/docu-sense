@@ -13,6 +13,11 @@ final readonly class SocialSecurityCoherence implements SocialSecurityCoherenceI
     public function execute(Payslip $payslip): array
     {
         $baseCC = $payslip->quoteBase()->commonContingencies()->amount();
+
+        if (! $baseCC) {
+            return [];
+        }
+
         $audits = [];
 
         /**

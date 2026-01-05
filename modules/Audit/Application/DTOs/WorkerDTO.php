@@ -7,18 +7,23 @@ use Modules\Payslip\Domain\ValueObjects\Worker;
 
 final readonly class WorkerDTO
 {
-    public string $name;
+    public ?string $name;
 
-    public string $nif;
+    public ?string $nif;
 
-    public string $ccc;
+    public ?string $ccc;
 
-    public Carbon $seniorityDate;
+    public ?Carbon $seniorityDate;
 
-    public string $quotationGroup;
+    public ?string $quotationGroup;
 
-    public function __construct(string $name, string $nif, string $ccc, Carbon $seniorityDate, string $quotationGroup)
-    {
+    public function __construct(
+        ?string $name,
+        ?string $nif,
+        ?string $ccc,
+        ?Carbon $seniorityDate,
+        ?string $quotationGroup
+    ) {
         $this->name = $name;
         $this->nif = $nif;
         $this->ccc = $ccc;
@@ -43,7 +48,7 @@ final readonly class WorkerDTO
             'Nombre' => $this->name,
             'NIF' => $this->nif,
             'CCC' => $this->ccc,
-            'Fecha antiguedad' => $this->seniorityDate->format('d/m/Y'),
+            'Fecha antiguedad' => $this->seniorityDate?->format('d/m/Y'),
             'Grupo cotización' => $this->quotationGroup,
         ];
     }

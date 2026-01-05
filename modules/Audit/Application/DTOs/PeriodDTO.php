@@ -7,13 +7,13 @@ use Modules\Payslip\Domain\ValueObjects\Period;
 
 final readonly class PeriodDTO
 {
-    public Carbon $startDate;
+    public ?Carbon $startDate;
 
-    public Carbon $endDate;
+    public ?Carbon $endDate;
 
-    public int $totalDays;
+    public ?int $totalDays;
 
-    public function __construct(Carbon $startDate, Carbon $endDate, int $totalDays)
+    public function __construct(?Carbon $startDate, ?Carbon $endDate, ?int $totalDays)
     {
         $this->startDate = $startDate;
         $this->endDate = $endDate;
@@ -28,8 +28,8 @@ final readonly class PeriodDTO
     public function toArray(): array
     {
         return [
-            'Inicio' => $this->startDate->format('d/m/Y'),
-            'Fin' => $this->endDate->format('d/m/Y'),
+            'Inicio' => $this->startDate?->format('d/m/Y'),
+            'Fin' => $this->endDate?->format('d/m/Y'),
             'Días totales' => $this->totalDays,
         ];
     }

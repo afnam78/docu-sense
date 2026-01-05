@@ -6,30 +6,30 @@ use Modules\Shared\Domain\ValueObjects\Money;
 
 class Total
 {
-    private Money $net;
+    private ?Money $net;
 
-    private Money $taxes;
+    private ?Money $taxes;
 
-    private Money $total;
+    private ?Money $total;
 
-    public function __construct(Money $net, Money $taxes, Money $total)
+    public function __construct(?Money $net, ?Money $taxes, ?Money $total)
     {
         $this->net = $net;
         $this->taxes = $taxes;
         $this->total = $total;
     }
 
-    public function net(): Money
+    public function net(): ?Money
     {
         return $this->net;
     }
 
-    public function taxes(): Money
+    public function taxes(): ?Money
     {
         return $this->taxes;
     }
 
-    public function total(): Money
+    public function total(): ?Money
     {
         return $this->total;
     }

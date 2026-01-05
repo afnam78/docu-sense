@@ -6,13 +6,13 @@ use Modules\Payslip\Domain\ValueObjects\Total;
 
 final readonly class TotalDTO
 {
-    public float $net;
+    public ?float $net;
 
-    public float $taxes;
+    public ?float $taxes;
 
-    public float $total;
+    public ?float $total;
 
-    public function __construct(float $net, float $taxes, float $total)
+    public function __construct(?float $net, ?float $taxes, ?float $total)
     {
         $this->net = $net;
         $this->taxes = $taxes;
@@ -21,15 +21,15 @@ final readonly class TotalDTO
 
     public static function fromObject(Total $totals): self
     {
-        return new self($totals->net()->toDecimal(), $totals->taxes()->toDecimal(), $totals->total()->toDecimal());
+        return new self($totals->net()?->toDecimal(), $totals->taxes()?->toDecimal(), $totals->total()?->toDecimal());
     }
 
     public function toArray(): array
     {
         return [
-            'Bruto' => $this->net.'€',
-            'Impuestos' => $this->taxes.'€',
-            'Neto' => $this->total.'€',
+            'Bruto' => $this->net ? $this->net.'€' : null,
+            'Impuestos' => $this->taxes ? $this->taxes.'€' : null,
+            'Neto' => $this->total ? $this->total.'€' : null,
         ];
     }
 }

@@ -43,6 +43,13 @@
                               'title' => 'Smart Check: Heurísticas de Confianza',
                               'items' => $heuristicIntegrity,
                           ])
+
+                                @if(!empty($fieldsSanity))
+                                    @include('audit::partials.audit-message-stack', [
+                                  'title' => 'Campos vacíos',
+                                  'items' => $fieldsSanity,
+                                  ])
+                                @endif
                             </div>
                         </div>
                     </div>

@@ -7,9 +7,9 @@ use Modules\Payslip\Domain\ValueObjects\Company;
 final readonly class CompanyDTO
 {
     public function __construct(
-        public string $name,
-        public string $cif,
-        public string $ccc,
+        public ?string $name,
+        public ?string $cif,
+        public ?string $ccc,
     ) {}
 
     public static function fromObject(Company $company): self

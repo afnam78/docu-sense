@@ -20,6 +20,11 @@ final readonly class AuditDTO
          * @var AuditMessageDTO[]
          */
         public array $heuristicIntegrity,
+
+        /**
+         * @var AuditMessageDTO[]
+         */
+        public array $fieldsSanity
     ) {}
 
     public static function fromObject(Audit $object): self
@@ -28,6 +33,7 @@ final readonly class AuditDTO
             array_map(fn (AuditMessage $item) => AuditMessageDTO::fromObject($item), $object->arithmeticCoherence()),
             array_map(fn (AuditMessage $item) => AuditMessageDTO::fromObject($item), $object->socialSecurityCoherence()),
             array_map(fn (AuditMessage $item) => AuditMessageDTO::fromObject($item), $object->heuristicIntegrity()),
+            array_map(fn (AuditMessage $item) => AuditMessageDTO::fromObject($item), $object->fieldsSanity())
         );
     }
 
@@ -45,6 +51,10 @@ final readonly class AuditDTO
             'heuristic_integrity' => array_map(
                 fn (AuditMessageDTO $item) => $item->toArray(),
                 $this->heuristicIntegrity
+            ),
+            'fields_sanity' => array_map(
+                fn (AuditMessageDTO $item) => $item->toArray(),
+                $this->fieldsSanity
             ),
         ];
     }

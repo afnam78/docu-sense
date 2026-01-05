@@ -22,8 +22,6 @@ final readonly class OpenAIService implements OpenAIServiceInterface
                 return $requestRegistered;
             }
 
-            $hocrJson = json_encode($this->parseHocrToMap($hocr));
-
             $response = OpenAI::chat()->create([
                 'model' => 'gpt-4o',
                 'messages' => [
@@ -46,7 +44,7 @@ final readonly class OpenAIService implements OpenAIServiceInterface
                                 'El valor del campo file_hash será: '.$hash.'. '.
                                 'Rellena valid_structure con true si se cumplen los campos requeridos.'.
                                     "Texto extraído por el motor OCR: \n\n".$ocr.
-                                    "Texto extraído por el motor HOCR: \n\n".$hocrJson,
+                                    "Texto extraído por el motor HOCR: \n\n".$hocr,
                             ],
                             ['type' => 'image_url', 'image_url' => ['url' => $base64]],
                         ],
@@ -175,30 +173,5 @@ final readonly class OpenAIService implements OpenAIServiceInterface
 
             throw $e;
         }
-    }
-
-    /**
-     * Extrae texto y coordenadas del hOCR para dárselo a la IA de forma compacta.
-     */
-    private function parseHocrToMap(string $hocr): array
-    {
-        $dom = new \DOMDocument;
-        @$dom->loadHTML($hocr);
-        $xpath = new \DOMXPath($dom);
-        $map = [];
-
-        // Buscamos los nodos 'ocrx_word' que contienen el texto y el bbox
-        foreach ($xpath->query("//span[@class='ocrx_word']") as $word) {
-            $title = $word->getAttribute('title');
-            if (preg_match('/bbox (\d+) (\d+) (\d+) (\d+)/', $title, $matches)) {
-                $map[] = [
-                    't' => $word->nodeValue,
-                    'b' => [(int) $matches[1], (int) $matches[2], (int) $matches[3], (int) $matches[4]],
-                ];
-            }
-        }
-
-        // Retornamos un subset para no exceder la ventana de contexto si el hOCR es muy denso
-        return array_slice($map, 0, 600);
     }
 }

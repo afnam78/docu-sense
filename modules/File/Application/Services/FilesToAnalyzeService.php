@@ -7,15 +7,18 @@ use Illuminate\Support\Facades\Storage;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Modules\File\Application\Contracts\FilesToAnalyzeServiceInterface;
 use Modules\File\Domain\Contracts\FileRepositoryInterface;
+use Modules\File\Domain\Contracts\OcrExtractServiceInterface;
 use Modules\File\Domain\Entities\File;
 use Modules\File\Domain\Enums\StatusEnum;
 use Modules\File\Infrastructure\Jobs\AnalyzeFileJob;
 use Spatie\PdfToImage\Pdf;
-use thiagoalessio\TesseractOCR\TesseractOCR;
 
 final readonly class FilesToAnalyzeService implements FilesToAnalyzeServiceInterface
 {
-    public function __construct(private FileRepositoryInterface $repository) {}
+    public function __construct(
+        private FileRepositoryInterface $repository,
+        private OcrExtractServiceInterface $ocrExtractService,
+    ) {}
 
     public function execute(array $documents): void
     {
@@ -51,14 +54,8 @@ final readonly class FilesToAnalyzeService implements FilesToAnalyzeServiceInter
         $mimeType = \Illuminate\Support\Facades\File::mimeType($file->getRealPath());
         $base64Image = "data:{$mimeType};base64,".$entity->base64();
 
-        $ocrText = (new TesseractOCR($file->getRealPath()))
-            ->lang('spa')
-            ->run();
-
-        $hocrData = (new TesseractOCR($file->getRealPath()))
-            ->lang('spa')
-            ->hocr()
-            ->run();
+        $ocrText = $this->ocrExtractService->getText($file->getRealPath());
+        $hocrData = $this->ocrExtractService->getHexagonalText($file->getRealPath());
 
         return new AnalyzeFileJob($entity->hash(), $base64Image, auth()->user()->id, $ocrText, $hocrData);
     }
@@ -80,16 +77,10 @@ final readonly class FilesToAnalyzeService implements FilesToAnalyzeServiceInter
             $mimeType = \Illuminate\Support\Facades\File::mimeType($path);
             $base64String = "data:{$mimeType};base64,{$base64}";
 
-            $ocrText = (new TesseractOCR($path))
-                ->lang('spa')
-                ->run();
+            $ocrText = $this->ocrExtractService->getText($path);
+            $hocrData = $this->ocrExtractService->getHexagonalText($path);
 
-            $hocrData = (new TesseractOCR($path))
-                ->lang('spa')
-                ->hocr()
-                ->run();
-
-            Storage::delete($path);
+            \Illuminate\Support\Facades\File::delete($path);
         } else {
             throw new \Exception('File not found');
         }

@@ -6,13 +6,13 @@ use Modules\Payslip\Domain\ValueObjects\Concept;
 
 final class ConceptDTO
 {
-    public float $amount;
+    public ?float $amount;
 
-    public string $concept;
+    public ?string $concept;
 
-    public float $percentage;
+    public ?float $percentage;
 
-    public function __construct(float $amount, string $concept, float $percentage)
+    public function __construct(?float $amount, ?string $concept, ?float $percentage)
     {
         $this->amount = $amount;
         $this->concept = $concept;
@@ -26,6 +26,10 @@ final class ConceptDTO
 
     public function toString(): string
     {
+        if (! $this->concept && ! $this->amount) {
+            return '';
+        }
+
         $sprintFormat = $this->percentage ? '%s: %.2f€ (%.2f%%)' : '%s: %.2f€';
 
         return sprintf(
