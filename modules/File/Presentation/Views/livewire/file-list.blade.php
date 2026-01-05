@@ -16,6 +16,9 @@
                                 class="text-xs text-gray-700 uppercase bg-gray-50">
                             <tr>
                                 <th scope="col" class="px-6 py-3">
+                                    Acciones
+                                </th>
+                                <th scope="col" class="px-6 py-3">
                                     Nombre
                                 </th>
                                 <th scope="col" class="px-6 py-3">
@@ -35,6 +38,12 @@
                             <tbody>
                             @foreach($files as $file)
                                 <tr class="bg-white border-b border-gray-200 hover:bg-gray-50 ">
+                                    <td class="px-6 py-4">
+                                        <a href="{{ route('audit.detail', $file->file_hash) }}"
+                                           class="font-medium text-blue-600 hover:underline">
+                                            Ver
+                                        </a>
+                                    </td>
                                     <th scope="row"
                                         class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                                         {{ $file->name }}

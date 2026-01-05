@@ -3,6 +3,7 @@
 namespace Modules\Audit\Infrastructure\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Livewire\Livewire;
 use Modules\Audit\Domain\Contracts\ArithmeticCoherenceInterface;
 use Modules\Audit\Domain\Contracts\AuditRepositoryInterface;
 use Modules\Audit\Domain\Contracts\AuditServiceInterface;
@@ -23,10 +24,15 @@ class ModuleProvider extends ServiceProvider
         $this->app->bind(SocialSecurityCoherenceInterface::class, SocialSecurityCoherence::class);
         $this->app->bind(ArithmeticCoherenceInterface::class, ArithmeticCoherence::class);
         $this->app->bind(AuditRepositoryInterface::class, AuditRepository::class);
+        $this->app->register(RouteServiceProvider::class);
+
+        Livewire::component('audit-detail', \Modules\Audit\Presentation\Livewire\AuditDetail::class);
+
     }
 
     public function boot(): void
     {
         $this->loadMigrationsFrom(__DIR__.'/../Databases/Migrations');
+        $this->loadViewsFrom(__DIR__.'/../../Presentation/Views', 'audit');
     }
 }
