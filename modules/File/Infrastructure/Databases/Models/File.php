@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Modules\Audit\Infrastructure\Databases\Models\Audit;
+use Modules\OpenAI\Infrastructure\Databases\Models\OpenAiRequest;
 
 class File extends Model
 {
@@ -25,5 +26,10 @@ class File extends Model
     public function audit(): HasOne
     {
         return $this->hasOne(Audit::class, 'file_hash', 'hash');
+    }
+
+    public function request(): HasOne
+    {
+        return $this->hasOne(OpenAiRequest::class, 'file_hash', 'hash');
     }
 }

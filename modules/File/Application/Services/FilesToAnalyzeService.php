@@ -9,7 +9,6 @@ use Modules\File\Application\Contracts\FilesToAnalyzeServiceInterface;
 use Modules\File\Domain\Contracts\FileRepositoryInterface;
 use Modules\File\Domain\Entities\File;
 use Modules\File\Domain\Enums\StatusEnum;
-use Modules\File\Infrastructure\Events\FilesAnalyzed;
 use Modules\File\Infrastructure\Jobs\AnalyzeFileJob;
 use Spatie\PdfToImage\Pdf;
 
@@ -39,11 +38,7 @@ final readonly class FilesToAnalyzeService implements FilesToAnalyzeServiceInter
             $jobs[] = $job;
         });
 
-        Bus::batch($jobs)
-            ->then(function () {
-                FilesAnalyzed::dispatch(auth()->user()->id);
-            })
-            ->dispatch();
+        Bus::batch($jobs)->dispatch();
     }
 
     private function manageImageFiles(TemporaryUploadedFile $file, string $hash): AnalyzeFileJob
@@ -55,7 +50,7 @@ final readonly class FilesToAnalyzeService implements FilesToAnalyzeServiceInter
         $mimeType = \Illuminate\Support\Facades\File::mimeType($file->getRealPath());
         $base64Image = "data:{$mimeType};base64,".$entity->base64();
 
-        return new AnalyzeFileJob($entity->hash(), $base64Image);
+        return new AnalyzeFileJob($entity->hash(), $base64Image, auth()->user()->id);
     }
 
     private function managePdfFiles(TemporaryUploadedFile $file, string $hash): AnalyzeFileJob
@@ -80,7 +75,7 @@ final readonly class FilesToAnalyzeService implements FilesToAnalyzeServiceInter
             throw new \Exception('File not found');
         }
 
-        return new AnalyzeFileJob($hash, $base64String);
+        return new AnalyzeFileJob($hash, $base64String, auth()->user()->id);
     }
 
     private function createAndAddAlias(string $hash, TemporaryUploadedFile $file): File

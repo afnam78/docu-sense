@@ -28,25 +28,23 @@ class FileUploader extends Component
             $command = new AnalyzeFilesCommand($this->files);
             $useCase->handle($command);
 
-            $this->success('Analizando archivos...');
+            $this->info('Analizando archivos...');
         } catch (\Exception $e) {
-            dd($e->getMessage());
             Log::error('Analyze Files Error '.$e->getMessage());
 
             $this->error('Error al analizar los archivos');
-            return;
         }
     }
 
     public function getListeners(): array
     {
-        $channel = 'echo-private:App.Models.User.'.auth()->id().',.files.analyzed';
+        $channel = 'echo-private:App.Models.User.'.auth()->id().',.file.analyzed';
 
-        return [$channel => 'handleFilesAnalyzed'];
+        return [$channel => 'handleFileAnalyzed'];
     }
 
-    public function handleFilesAnalyzed(mixed $payload): void
+    public function handleFileAnalyzed(mixed $payload): void
     {
-        $this->success('Archivos analizados correctamente');
+        $this->success('Archivo '.$payload['fileName'].' analizado.');
     }
 }

@@ -52,7 +52,7 @@
                                     </td>
                                     <td class="py-4 flex justify-center">
                                         @if($file->file->status === StatusEnum::DONE->value )
-                                            @if($file->file->payslip_response)
+                                            @if($file->file->request->valid_structure)
                                                 <x-check class="size-5 text-green-600"/>
                                             @else
                                                 <x-x-circle class="size-5 text-red-500"/>

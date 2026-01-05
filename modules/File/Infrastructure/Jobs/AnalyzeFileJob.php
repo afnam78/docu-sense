@@ -9,6 +9,7 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Modules\File\Domain\Contracts\FileRepositoryInterface;
+use Modules\File\Infrastructure\Events\FileAnalyzed;
 use Modules\File\Infrastructure\Events\FileItemAnalyzedEvent;
 use Modules\OpenAI\Domain\Contracts\OpenAIServiceInterface;
 use OpenAI\Exceptions\RateLimitException;
@@ -27,7 +28,8 @@ class AnalyzeFileJob implements ShouldQueue
      */
     public function __construct(
         private readonly string $hash,
-        private readonly string $base64
+        private readonly string $base64,
+        private readonly int $userId,
     ) {}
 
     /**
@@ -42,6 +44,7 @@ class AnalyzeFileJob implements ShouldQueue
             $fileRepository->markAsDone($this->hash);
 
             FileItemAnalyzedEvent::dispatchIf($openAIRequest->valid_structure, $openAIRequest);
+            FileAnalyzed::dispatch($this->userId, $fileRepository->findByTenant($this->hash, $this->userId)->name());
         } catch (RateLimitException $e) {
             $this->release(30);
         }

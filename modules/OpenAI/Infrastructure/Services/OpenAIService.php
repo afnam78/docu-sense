@@ -32,7 +32,15 @@ final readonly class OpenAIService implements OpenAIServiceInterface
                     [
                         'role' => 'user',
                         'content' => [
-                            ['type' => 'text', 'text' => 'Extrae toda la información de esta nómina siguiendo siguiendo el esquema. El valor del campo file_hash será esta: '.$hash.'. Quiero que se rellene el campo valid_structure con true si se rellenan todos los campos requeridos, en caso contrario false. No incluyas ningún campo que no esté en el esquema.'],
+                            [
+                                'type' => 'text',
+                                'text' => 'Extrae toda la información de esta nómina siguiendo el esquema. '.
+                                'REGLAS DE FORMATO CRÍTICAS: '.
+                                '1. Todas las FECHAS deben usar el formato d/m/Y (ejemplo: 01/09/2023). '.
+                                '2. Los PORCENTAJES deben ser strings numéricos con COMA como separador decimal (ejemplo: 2,00 o 15,50). '.
+                                'El valor del campo file_hash será: '.$hash.'. '.
+                                'Rellena valid_structure con true si se cumplen los campos requeridos.',
+                            ],
                             ['type' => 'image_url', 'image_url' => ['url' => $base64]],
                         ],
                     ],
@@ -64,7 +72,7 @@ final readonly class OpenAIService implements OpenAIServiceInterface
                                         'dni' => ['type' => 'string'],
                                         'naf' => ['type' => 'string'],
                                         'grupo_cotizacion' => ['type' => 'string'],
-                                        'antiguedad' => ['type' => 'string'],
+                                        'antiguedad' => ['type' => 'string', 'description' => 'Fecha en formato d/m/Y'],
                                     ],
                                     'required' => ['nombre', 'dni', 'naf', 'grupo_cotizacion', 'antiguedad'],
                                     'additionalProperties' => false,
@@ -72,9 +80,9 @@ final readonly class OpenAIService implements OpenAIServiceInterface
                                 'periodo' => [
                                     'type' => 'object',
                                     'properties' => [
-                                        'fecha_inicio' => ['type' => 'string'],
-                                        'fecha_fin' => ['type' => 'string'],
-                                        'total_dias' => ['type' => 'string'],
+                                        'fecha_inicio' => ['type' => 'string', 'description' => 'Fecha en formato d/m/Y'],
+                                        'fecha_fin' => ['type' => 'string', 'description' => 'Fecha en formato d/m/Y'],
+                                        'total_dias' => ['type' => 'string', 'description' => 'Fecha en formato d/m/Y'],
                                     ],
                                     'required' => ['fecha_inicio', 'fecha_fin', 'total_dias'],
                                     'additionalProperties' => false,
@@ -98,7 +106,7 @@ final readonly class OpenAIService implements OpenAIServiceInterface
                                         'properties' => [
                                             'concepto' => ['type' => 'string'],
                                             'importe' => ['type' => 'string'],
-                                            'porcentaje' => ['type' => 'string'],
+                                            'porcentaje' => ['type' => 'string', 'description' => 'Número con decimal separado por coma'],
                                         ],
                                         'required' => ['concepto', 'importe', 'porcentaje'],
                                         'additionalProperties' => false,
@@ -125,7 +133,17 @@ final readonly class OpenAIService implements OpenAIServiceInterface
                                     'additionalProperties' => false,
                                 ],
                             ],
-                            'required' => ['file_hash', 'empresa', 'trabajador', 'periodo', 'devengos', 'deducciones', 'totales', 'bases_cotizacion', 'valid_structure'],
+                            'required' => [
+                                'file_hash',
+                                'empresa',
+                                'trabajador',
+                                'periodo',
+                                'devengos',
+                                'deducciones',
+                                'totales',
+                                'bases_cotizacion',
+                                'valid_structure',
+                            ],
                             'additionalProperties' => false,
                         ],
                     ],
