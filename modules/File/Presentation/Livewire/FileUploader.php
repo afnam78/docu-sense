@@ -28,7 +28,8 @@ class FileUploader extends Component
             $command = new AnalyzeFilesCommand($this->files);
             $useCase->handle($command);
 
-            $this->info('Analizando archivos...');
+            $this->success('Analizando archivos...');
+            $this->files = [];
         } catch (\Exception $e) {
             Log::error('Analyze Files Error '.$e->getMessage());
 

@@ -14,6 +14,8 @@ use Modules\Audit\Domain\Services\HeuristicIntegrity;
 use Modules\Audit\Domain\Services\PayslipAuditServiceService;
 use Modules\Audit\Domain\Services\PayslipFieldsSanityService;
 use Modules\Audit\Domain\Services\SocialSecurityCoherence;
+use Modules\Audit\Presentation\Livewire\AuditDetail;
+use Modules\Audit\Presentation\Livewire\AuditList;
 
 class ModuleProvider extends ServiceProvider
 {
@@ -26,7 +28,8 @@ class ModuleProvider extends ServiceProvider
         $this->app->bind(PayslipFieldsSanityServiceInterface::class, PayslipFieldsSanityService::class);
         $this->app->register(RouteServiceProvider::class);
 
-        Livewire::component('audit-detail', \Modules\Audit\Presentation\Livewire\AuditDetail::class);
+        Livewire::component('audit-detail', AuditDetail::class);
+        Livewire::component('audit-list', AuditList::class);
 
     }
 

@@ -40,8 +40,8 @@
                                 <tr class="bg-white border-b border-gray-200 hover:bg-gray-50 ">
                                     <td class="px-6 py-4">
                                             <a href="{{ route('audit.detail', $file->file_hash) }}"
-                                               class="font-medium text-blue-600 hover:underline">
-                                                Ver
+                                               class="">
+                                                <x-eye class="size-5"/>
                                             </a>
                                     </td>
                                     <th scope="row"

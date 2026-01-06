@@ -14,6 +14,8 @@ class AuditList extends Component
 
     public string $fileName;
 
+    public string $selectedHash;
+
     public function render(): \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\View\View
     {
         return view('audit::livewire.audit-list');
@@ -27,6 +29,8 @@ class AuditList extends Component
 
             $this->hashes = $result->hashes;
             $this->fileName = $result->fileName;
+            $this->setSelectedHash(collect($this->hashes)->first());
+
         } catch (AuditNotFound $e) {
             abort(404);
         } catch (\Exception $e) {
@@ -34,5 +38,10 @@ class AuditList extends Component
 
             abort(500);
         }
+    }
+
+    public function setSelectedHash(string $hash): void
+    {
+        $this->selectedHash = $hash;
     }
 }

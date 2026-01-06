@@ -9,10 +9,12 @@ class PeriodMapper
 {
     public static function fromResponse(array $data): Period
     {
+        $totalDays = data_get($data, 'total_dias');
+
         return new Period(
             startDate: Carbon::createFromFormat('d/m/Y', data_get($data, 'fecha_inicio')),
             endDate: Carbon::createFromFormat('d/m/Y', data_get($data, 'fecha_fin')),
-            totalDays: data_get($data, 'total_dias'),
+            totalDays: is_numeric($totalDays) ? (int) $totalDays : null,
         );
     }
 }
