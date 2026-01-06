@@ -30,6 +30,25 @@ class FileRepository implements FileRepositoryInterface
         }
     }
 
+    public function analyzable(string $hash): bool
+    {
+        try {
+            $file = \Modules\File\Infrastructure\Databases\Models\File::find($hash);
+
+            if (! $file) {
+                return false;
+            }
+
+            return in_array($file->status, [
+                StatusEnum::TO_ANALYZE->value,
+            ], true);
+        } catch (\Exception $e) {
+            Log::error('File Repository Error: analyzable method '.$e->getMessage());
+
+            throw $e;
+        }
+    }
+
     public function findByTenant(string $hash, int $userId): ?File
     {
         try {
@@ -68,6 +87,27 @@ class FileRepository implements FileRepositoryInterface
 
         } catch (\Exception $e) {
             Log::error('File Repository Error: save method '.$e->getMessage());
+
+            throw $e;
+        }
+    }
+
+    public function sync(File $file): void
+    {
+        try {
+            if (! $file->fileHash()) {
+                return;
+            }
+
+            $model = \Modules\File\Infrastructure\Databases\Models\File::find($file->fileHash());
+
+            if (! $model) {
+                return;
+            }
+
+            $model->sheets()->syncWithoutDetaching($file->hash());
+        } catch (\Exception $e) {
+            Log::error('File Repository Error: sync method '.$e->getMessage());
 
             throw $e;
         }
@@ -120,6 +160,34 @@ class FileRepository implements FileRepositoryInterface
             ]);
         } catch (\Exception $e) {
             Log::error('File Repository Error: update method '.$e->getMessage());
+
+            throw $e;
+        }
+    }
+
+    public function sheets(string $fileHash): array
+    {
+        try {
+            $model = \Modules\File\Infrastructure\Databases\Models\File::with('sheets')->find($fileHash);
+
+            if (! $model) {
+                return [];
+            }
+
+            $sheets = [];
+
+            foreach ($model->sheets as $sheet) {
+                $sheets[] = new File(
+                    hash: $sheet->hash,
+                    mimeType: $sheet->mimetype,
+                    status: StatusEnum::from($sheet->status),
+                    fileHash: $fileHash,
+                );
+            }
+
+            return $sheets;
+        } catch (\Exception $e) {
+            Log::error('File Repository Error: sheets method '.$e->getMessage());
 
             throw $e;
         }

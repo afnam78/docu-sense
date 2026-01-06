@@ -2,34 +2,23 @@
 
 namespace Modules\File\Infrastructure\Events;
 
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class FileAnalyzed implements ShouldBroadcast
+class FileAnalyzed
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable, SerializesModels;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(private readonly int $userId, public readonly string $fileName)
+    public function __construct(private readonly int $userId, private readonly string $fileHash, public readonly string $fileName)
     {
         //
     }
 
-    /**
-     * Get the channels the event should broadcast on.
-     */
-    public function broadcastOn(): PrivateChannel
+    public function fileHash(): string
     {
-        return new PrivateChannel('App.Models.User.'.$this->userId);
-    }
-
-    public function broadcastAs(): string
-    {
-        return 'file.analyzed';
+        return $this->fileHash;
     }
 }

@@ -35,16 +35,4 @@ class FileUploader extends Component
             $this->error('Error al analizar los archivos');
         }
     }
-
-    public function getListeners(): array
-    {
-        $channel = 'echo-private:App.Models.User.'.auth()->id().',.file.analyzed';
-
-        return [$channel => 'handleFileAnalyzed'];
-    }
-
-    public function handleFileAnalyzed(mixed $payload): void
-    {
-        $this->success('Archivo '.$payload['fileName'].' analizado.');
-    }
 }

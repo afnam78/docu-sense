@@ -28,4 +28,9 @@ enum StatusEnum: string
             StatusEnum::TO_ANALYZE => 'Por Analizar',
         };
     }
+
+    public function isDone(): bool
+    {
+        return $this === self::DONE;
+    }
 }

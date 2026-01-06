@@ -6,8 +6,10 @@ use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
 use Modules\File\Application\Contracts\FilesAlreadyAnalyzedServiceInterface;
 use Modules\File\Application\Contracts\FilesToAnalyzeServiceInterface;
+use Modules\File\Application\Contracts\PdfSplitterServiceInterface;
 use Modules\File\Application\Services\FilesAlreadyAnalyzedService;
 use Modules\File\Application\Services\FilesToAnalyzeService;
+use Modules\File\Application\Services\PdfSplitterService;
 use Modules\File\Domain\Contracts\FileRepositoryInterface;
 use Modules\File\Domain\Contracts\OcrExtractServiceInterface;
 use Modules\File\Domain\Services\OcrExtractService;
@@ -22,6 +24,7 @@ class ModuleProvider extends ServiceProvider
         $this->app->bind(FilesToAnalyzeServiceInterface::class, FilesToAnalyzeService::class);
         $this->app->bind(FilesAlreadyAnalyzedServiceInterface::class, FilesAlreadyAnalyzedService::class);
         $this->app->bind(OcrExtractServiceInterface::class, OcrExtractService::class);
+        $this->app->bind(PdfSplitterServiceInterface::class, PdfSplitterService::class);
         $this->app->register(RouteServiceProvider::class);
     }
 

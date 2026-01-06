@@ -31,6 +31,7 @@ class AnalyzeFileJob implements ShouldQueue
         private readonly int $userId,
         public readonly string $ocr,
         public readonly string $hocr,
+        public readonly string $fileHash,
     ) {}
 
     /**
@@ -50,7 +51,7 @@ class AnalyzeFileJob implements ShouldQueue
 
             $fileRepository->markAsDone($this->hash);
 
-            FileAnalyzed::dispatch($this->userId, $fileRepository->findByTenant($this->hash, $this->userId)->name());
+            FileAnalyzed::dispatch($this->userId, $this->fileHash, $fileRepository->findByTenant($this->fileHash, $this->userId)->name());
         } catch (RateLimitException $e) {
             $this->release(30);
         }
@@ -58,7 +59,7 @@ class AnalyzeFileJob implements ShouldQueue
 
     public function failed(?Throwable $exception): void
     {
-        Log::critical('AnalyzeFileJob failed for file '.$this->hash.': '.$exception?->getMessage());
+        Log::critical('AnalyzeFileJob failed for file '.$this->fileHash.': '.$exception?->getMessage());
 
         $fileRepository = app(FileRepositoryInterface::class);
         $fileRepository->markAsError($this->hash);
@@ -66,7 +67,7 @@ class AnalyzeFileJob implements ShouldQueue
 
     public function tags(): array
     {
-        return ['analyze-file', 'file:'.$this->hash];
+        return ['analyze-file', 'file:'.$this->fileHash, 'user:'.$this->userId, 'sheetHash' => $this->hash];
     }
 
     public function backoff(): array

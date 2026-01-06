@@ -8,6 +8,8 @@ interface FileRepositoryInterface
 {
     public function find(string $hash): ?File;
 
+    public function analyzable(string $hash): bool;
+
     public function findByTenant(string $hash, int $userId): ?File;
 
     public function markAsDone(string $hash): void;
@@ -18,5 +20,7 @@ interface FileRepositoryInterface
 
     public function markAsError(string $hash): void;
 
-    public function update(File $file);
+    public function update(File $file): void;
+
+    public function sheets(string $fileHash): array;
 }

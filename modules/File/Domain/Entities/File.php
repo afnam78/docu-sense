@@ -12,6 +12,7 @@ final class File
         private StatusEnum $status,
         private ?string $base64 = null,
         private ?string $name = null,
+        private ?string $fileHash = null
     ) {}
 
     public function hash(): string
@@ -37,6 +38,11 @@ final class File
     public function name(): ?string
     {
         return $this->name;
+    }
+
+    public function fileHash(): ?string
+    {
+        return $this->fileHash;
     }
 
     public function setBase64(?string $base64): void

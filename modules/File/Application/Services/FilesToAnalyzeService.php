@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Modules\File\Application\Contracts\FilesToAnalyzeServiceInterface;
+use Modules\File\Application\Contracts\PdfSplitterServiceInterface;
 use Modules\File\Domain\Contracts\FileRepositoryInterface;
 use Modules\File\Domain\Contracts\OcrExtractServiceInterface;
 use Modules\File\Domain\Entities\File;
@@ -18,21 +19,22 @@ final readonly class FilesToAnalyzeService implements FilesToAnalyzeServiceInter
     public function __construct(
         private FileRepositoryInterface $repository,
         private OcrExtractServiceInterface $ocrExtractService,
+        private PdfSplitterServiceInterface $pdfSplitterService,
     ) {}
 
     public function execute(array $documents): void
     {
         $jobs = [];
 
-        collect($documents)->each(function (TemporaryUploadedFile $file, string $hash) use (&$jobs) {
+        collect($documents)->each(function (TemporaryUploadedFile $file, string $originalHash) use (&$jobs) {
             $job = null;
 
             if (in_array($file->getClientOriginalExtension(), ['jpeg', 'png', 'jpg'])) {
-                $job = $this->manageImageFiles($file, $hash);
+                $job = $this->manageImageFiles($file);
             }
 
             if ($file->getClientOriginalExtension() === 'pdf') {
-                $job = $this->managePdfFiles($file, $hash);
+                $jobs = array_merge($jobs, $this->managePdfFiles($file, $originalHash));
             }
 
             if (! $job) {
@@ -45,8 +47,9 @@ final readonly class FilesToAnalyzeService implements FilesToAnalyzeServiceInter
         Bus::batch($jobs)->dispatch();
     }
 
-    private function manageImageFiles(TemporaryUploadedFile $file, string $hash): AnalyzeFileJob
+    private function manageImageFiles(TemporaryUploadedFile $file): AnalyzeFileJob
     {
+        $hash = hash_file('sha256', $file->getRealPath());
         $entity = $this->createAndAddAlias($hash, $file);
 
         $entity->setBase64(base64_encode(file_get_contents($file->getRealPath())));
@@ -57,35 +60,50 @@ final readonly class FilesToAnalyzeService implements FilesToAnalyzeServiceInter
         $ocrText = $this->ocrExtractService->getText($file->getRealPath());
         $hocrData = $this->ocrExtractService->getHexagonalText($file->getRealPath());
 
-        return new AnalyzeFileJob($entity->hash(), $base64Image, auth()->user()->id, $ocrText, $hocrData);
+        return new AnalyzeFileJob($entity->hash(), $base64Image, auth()->user()->id, $ocrText, $hocrData, $entity->hash());
     }
 
-    private function managePdfFiles(TemporaryUploadedFile $file, string $hash): AnalyzeFileJob
+    private function managePdfFiles(TemporaryUploadedFile $file, string $originalHash): array
     {
-        $this->createAndAddAlias($hash, $file);
+        $jobs = [];
 
-        $pdf = new Pdf($file->getRealPath());
+        $this->createAndAddAlias($originalHash, $file);
 
-        Storage::makeDirectory('pdfs');
-        $path = storage_path('app/private/pdfs/'.$hash.'.jpg');
-        $pdf->save($path);
+        $splittedPdfPaths = $this->pdfSplitterService->execute($file, $originalHash);
 
-        if (\Illuminate\Support\Facades\File::exists($path)) {
+        Storage::disk('local')->makeDirectory('pdfs');
 
-            $fileContent = \Illuminate\Support\Facades\File::get($path);
-            $base64 = base64_encode($fileContent);
-            $mimeType = \Illuminate\Support\Facades\File::mimeType($path);
-            $base64String = "data:{$mimeType};base64,{$base64}";
+        foreach ($splittedPdfPaths as $hash => $splittedPdfPathItem) {
+            $splittedFile = Storage::disk('local')->get($splittedPdfPathItem);
 
-            $ocrText = $this->ocrExtractService->getText($path);
-            $hocrData = $this->ocrExtractService->getHexagonalText($path);
+            if (! $splittedFile) {
+                continue;
+            }
 
-            \Illuminate\Support\Facades\File::delete($path);
-        } else {
-            throw new \Exception('File not found');
+            $pdf = new Pdf(Storage::disk('local')->path($splittedPdfPathItem));
+
+            $relativePath = 'pdfs/'.$hash.'.jpg';
+            $path = Storage::disk('local')->path($relativePath);
+            $pdf->save($path);
+
+            if (Storage::disk('local')->exists($relativePath)) {
+                $fileContent = Storage::disk('local')->get($relativePath);
+                $base64 = base64_encode($fileContent);
+                $base64String = 'data:image/jpeg;base64,'.$base64;
+
+                $ocrText = $this->ocrExtractService->getText($path);
+                $hocrData = $this->ocrExtractService->getHexagonalText($path);
+
+                Storage::disk('local')->delete($splittedPdfPathItem);
+                Storage::disk('local')->delete($relativePath);
+
+                $jobs[] = new AnalyzeFileJob($hash, $base64String, auth()->user()->id, $ocrText, $hocrData, $originalHash);
+            } else {
+                throw new \Exception('File not found');
+            }
         }
 
-        return new AnalyzeFileJob($hash, $base64String, auth()->user()->id, $ocrText, $hocrData);
+        return $jobs;
     }
 
     private function createAndAddAlias(string $hash, TemporaryUploadedFile $file): File

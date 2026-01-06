@@ -22,8 +22,6 @@ class AuditDetail extends Component
 
     public array $payslip;
 
-    public string $fileName;
-
     public function render()
     {
         return view('audit::livewire.audit-detail');
@@ -36,7 +34,6 @@ class AuditDetail extends Component
             $command = new FindAuditCommand($hash);
             $result = $useCase->handle($command);
 
-            $this->fileName = $result->fileName;
             $audit = $result->audit->toArray();
             $this->payslip = $result->payslip->toArray();
 

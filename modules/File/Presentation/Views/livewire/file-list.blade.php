@@ -39,12 +39,10 @@
                             @foreach($files as $file)
                                 <tr class="bg-white border-b border-gray-200 hover:bg-gray-50 ">
                                     <td class="px-6 py-4">
-                                        @if($file->file->request)
                                             <a href="{{ route('audit.detail', $file->file_hash) }}"
                                                class="font-medium text-blue-600 hover:underline">
                                                 Ver
                                             </a>
-                                        @endif
                                     </td>
                                     <th scope="row"
                                         class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
@@ -62,7 +60,7 @@
                                         {{ $file->file->mimetype }}
                                     </td>
                                     <td class="py-4 flex justify-center">
-                                        @if($file->file->status === StatusEnum::DONE->value )
+                                        @if($file->file->status === StatusEnum::DONE->value && $file->file->mimetype !== 'pdf')
                                             @if($file->file->request?->valid_structure)
                                                 <x-check class="size-5 text-green-600"/>
                                             @else

@@ -39,6 +39,12 @@ final readonly class AnalyzeFilesUseCase
         $documentsToAnalyze = collect($documents)->map(function (TemporaryUploadedFile $file) use (&$documentsAlreadyAnalyzed) {
             $hash = hash_file('sha256', $file->getRealPath());
 
+            if ($file->getMimeType() === 'application/pdf') {
+                return [
+                    $hash => $file,
+                ];
+            }
+
             $document = $this->repository->find($hash);
 
             if ($document) {

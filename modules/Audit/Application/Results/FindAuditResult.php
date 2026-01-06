@@ -10,6 +10,5 @@ final readonly class FindAuditResult
     public function __construct(
         public AuditDTO $audit,
         public PayslipDTO $payslip,
-        public string $fileName,
     ) {}
 }
