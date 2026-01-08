@@ -3,8 +3,9 @@
 namespace Modules\Audit\Domain\Services;
 
 use Modules\Audit\Domain\Contracts\PayslipFieldsSanityServiceInterface;
+use Modules\Audit\Domain\Entities\AuditItem;
 use Modules\Audit\Domain\Enums\StatusEnum;
-use Modules\Audit\Domain\ValueObjects\AuditMessage;
+use Modules\Audit\Domain\ValueObjects\Log;
 use Modules\Payslip\Domain\Entities\Payslip;
 use Modules\Payslip\Domain\ValueObjects\Company;
 use Modules\Payslip\Domain\ValueObjects\Period;
@@ -14,16 +15,19 @@ use Modules\Payslip\Domain\ValueObjects\Worker;
 
 class PayslipFieldsSanityService implements PayslipFieldsSanityServiceInterface
 {
-    public function execute(Payslip $payslip): array
+    public function execute(Payslip $payslip): AuditItem
     {
-        $audits = [];
-
-        return array_merge($audits,
+        $logs = array_merge(
             $this->companySanity($payslip->company()),
             $this->workerSanity($payslip->worker()),
             $this->periodSanity($payslip->period()),
             $this->totalSanity($payslip->totals()),
             $this->quoteBaseSanity($payslip->quoteBase()),
+        );
+
+        return new AuditItem(
+            StatusEnum::getStatusByPriority(array_map(fn (Log $log) => $log->status(), $logs)),
+            $logs
         );
     }
 
@@ -32,21 +36,21 @@ class PayslipFieldsSanityService implements PayslipFieldsSanityServiceInterface
         $audits = [];
 
         if (! $quoteBase->irpf()) {
-            $audits[] = new AuditMessage(
+            $audits[] = new Log(
                 status: StatusEnum::WARNING,
                 title: 'Base imponible del IRPF',
             );
         }
 
         if (! $quoteBase->professionalContingencies()) {
-            $audits[] = new AuditMessage(
+            $audits[] = new Log(
                 status: StatusEnum::WARNING,
                 title: 'Base de contingencias profesionales',
             );
         }
 
         if (! $quoteBase->commonContingencies()) {
-            $audits[] = new AuditMessage(
+            $audits[] = new Log(
                 status: StatusEnum::WARNING,
                 title: 'Base de contingencias comunes',
             );
@@ -60,21 +64,21 @@ class PayslipFieldsSanityService implements PayslipFieldsSanityServiceInterface
         $audits = [];
 
         if (! $company->name()) {
-            $audits[] = new AuditMessage(
+            $audits[] = new Log(
                 status: StatusEnum::WARNING,
                 title: 'Nombre de la empresa',
             );
         }
 
         if (! $company->cif()) {
-            $audits[] = new AuditMessage(
+            $audits[] = new Log(
                 status: StatusEnum::WARNING,
                 title: 'CIF de la empresa',
             );
         }
 
         if (! $company->ccc()) {
-            $audits[] = new AuditMessage(
+            $audits[] = new Log(
                 status: StatusEnum::WARNING,
                 title: 'CCC de la empresa',
             );
@@ -88,35 +92,35 @@ class PayslipFieldsSanityService implements PayslipFieldsSanityServiceInterface
         $audits = [];
 
         if (! $worker->name()) {
-            $audits[] = new AuditMessage(
+            $audits[] = new Log(
                 status: StatusEnum::WARNING,
                 title: 'Nombre del trabajador',
             );
         }
 
         if (! $worker->nif()) {
-            $audits[] = new AuditMessage(
+            $audits[] = new Log(
                 status: StatusEnum::WARNING,
                 title: 'NIF del trabajador',
             );
         }
 
         if (! $worker->ccc()) {
-            $audits[] = new AuditMessage(
+            $audits[] = new Log(
                 status: StatusEnum::WARNING,
                 title: 'SS del trabajador',
             );
         }
 
         if (! $worker->seniorityDate()) {
-            $audits[] = new AuditMessage(
+            $audits[] = new Log(
                 status: StatusEnum::WARNING,
                 title: 'Fecha de antigüedad del trabajador',
             );
         }
 
         if (! $worker->quotationGroup()) {
-            $audits[] = new AuditMessage(
+            $audits[] = new Log(
                 status: StatusEnum::WARNING,
                 title: 'Grupo de cotización del trabajador',
             );
@@ -130,21 +134,21 @@ class PayslipFieldsSanityService implements PayslipFieldsSanityServiceInterface
         $audits = [];
 
         if (! $period->startDate()) {
-            $audits[] = new AuditMessage(
+            $audits[] = new Log(
                 status: StatusEnum::WARNING,
                 title: 'Inicio del periodo',
             );
         }
 
         if (! $period->endDate()) {
-            $audits[] = new AuditMessage(
+            $audits[] = new Log(
                 status: StatusEnum::WARNING,
                 title: 'Fin del periodo',
             );
         }
 
         if (! $period->totalDays()) {
-            $audits[] = new AuditMessage(
+            $audits[] = new Log(
                 status: StatusEnum::WARNING,
                 title: 'Total de días del periodo',
             );
@@ -158,21 +162,21 @@ class PayslipFieldsSanityService implements PayslipFieldsSanityServiceInterface
         $audits = [];
 
         if (! $total->net()) {
-            $audits[] = new AuditMessage(
+            $audits[] = new Log(
                 status: StatusEnum::WARNING,
                 title: 'Neto',
             );
         }
 
         if (! $total->taxes()) {
-            $audits[] = new AuditMessage(
+            $audits[] = new Log(
                 status: StatusEnum::WARNING,
                 title: 'Impuestos',
             );
         }
 
         if (! $total->total()) {
-            $audits[] = new AuditMessage(
+            $audits[] = new Log(
                 status: StatusEnum::WARNING,
                 title: 'Bruto',
             );

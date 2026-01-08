@@ -12,12 +12,11 @@
             <div class=" text-gray-900 space-y-4">
                 <div class="flex justify-start gap-2">
                     @if(count($hashes) !== 1)
-                        <div class="space-y-1">
+                        <div class="space-y-1 max-w-36 w-full">
                             @foreach($hashes as $hash)
                                 <button
                                     class="border block w-40 w-full rounded shadow px-4 py-1  @if($selectedHash == $hash) bg-accent text-white @else bg-white @endif"
-                                    wire:click="setSelectedHash('{{$hash}}')"
-                                ">
+                                    wire:click="setSelectedHash('{{$hash}}')">
                                 Análisis {{$loop->index + 1}}
                                 </button>
                             @endforeach

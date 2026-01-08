@@ -51,7 +51,7 @@ class AnalyzeFileJob implements ShouldQueue
 
             $fileRepository->markAsDone($this->hash);
 
-            FileAnalyzed::dispatch($this->userId, $this->fileHash, $fileRepository->findByTenant($this->fileHash, $this->userId)->name());
+            FileAnalyzed::dispatch($this->userId, $this->fileHash, $this->hash, $fileRepository->findByTenant($this->fileHash, $this->userId)->name());
         } catch (RateLimitException $e) {
             $this->release(30);
         }

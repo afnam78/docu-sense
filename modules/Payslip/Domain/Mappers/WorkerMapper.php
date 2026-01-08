@@ -19,4 +19,11 @@ class WorkerMapper
             quotationGroup: data_get($data, 'grupo_cotizacion'),
         );
     }
+
+    public static function isValidStructure(array $data): bool
+    {
+        return isset(
+            $data['antiguedad'],
+        );
+    }
 }

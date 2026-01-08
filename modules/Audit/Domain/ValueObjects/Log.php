@@ -4,7 +4,7 @@ namespace Modules\Audit\Domain\ValueObjects;
 
 use Modules\Audit\Domain\Enums\StatusEnum;
 
-final readonly class AuditMessage
+final readonly class Log
 {
     public function __construct(
         private StatusEnum $status,

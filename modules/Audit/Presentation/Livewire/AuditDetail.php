@@ -44,7 +44,6 @@ class AuditDetail extends Component
         } catch (AuditNotFound $e) {
             abort(404, 'Audit not found.');
         } catch (\Exception $e) {
-            throw $e;
             Log::error('Error mounting AuditDetail component: '.$e->getMessage());
             abort(500, 'An error occurred while loading the audit details.');
         }

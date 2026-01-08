@@ -15,23 +15,23 @@
                             <thead
                                 class="text-xs text-gray-700 uppercase bg-gray-50">
                             <tr>
-                                <th scope="col" class="px-6 py-3">
+                                <th scope="col" class="px-6 py-3 w-14">
                                     Acciones
                                 </th>
                                 <th scope="col" class="px-6 py-3">
                                     Nombre
                                 </th>
-                                <th scope="col" class="px-6 py-3">
+                                <th scope="col" class="px-6 py-3 text-center">
                                     Estado
                                 </th>
-                                <th scope="col" class="px-6 py-3">
+                                <th scope="col" class="px-2 py-3 text-center">
                                     Formato
                                 </th>
-                                <th scope="col" class="px-6 py-3 text-center">
+                                <th scope="col" class="px-2 py-3 text-center">
                                     Nómina
                                 </th>
                                 <th scope="col" class="px-6 py-3 text-center">
-                                    Hash
+                                    Fecha de subida
                                 </th>
                             </tr>
                             </thead>
@@ -39,16 +39,18 @@
                             @foreach($files as $file)
                                 <tr class="bg-white border-b border-gray-200 hover:bg-gray-50 ">
                                     <td class="px-6 py-4">
+                                        @if($file->file->status === StatusEnum::DONE->value)
                                             <a href="{{ route('audit.detail', $file->file_hash) }}"
                                                class="">
                                                 <x-eye class="size-5"/>
                                             </a>
+                                        @endif
                                     </td>
                                     <th scope="row"
                                         class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                                         {{ $file->name }}
                                     </th>
-                                    <td class="px-6 py-4">
+                                    <td class="px-6 py-4 flex justify-center">
                                         @php
                                             $statusEnum = StatusEnum::from($file->file->status);
                                         @endphp
@@ -56,22 +58,25 @@
     $statusEnum->label()
 }}</x-badge>
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="px-2 py-4 text-center">
                                         {{ $file->file->mimetype }}
                                     </td>
-                                    <td class="py-4 flex justify-center">
-                                        @if($file->file->status === StatusEnum::DONE->value && $file->file->mimetype !== 'pdf')
-                                            @if($file->file->request?->valid_structure)
-                                                <x-check class="size-5 text-green-600"/>
-                                            @else
-                                                <x-x-circle class="size-5 text-red-500"/>
-                                            @endif
-                                        @else
-                                            <x-minus-circle class="size-5 text-gray-700"/>
-                                        @endif
+                                    <td class="px-2 py-4">
+                                       <span class="flex justify-center">
+                                            @if($file->file->status === StatusEnum::DONE->value)
+                                               @if($file->file->audits->isNotEmpty())
+                                                   <x-check class="size-5 text-green-600"/>
+                                               @else
+                                                   <x-x-circle class="size-5 text-red-500"/>
+                                               @endif
+                                           @else
+
+                                               <x-minus-circle class="size-5 text-gray-700"/>
+                                           @endif
+                                       </span>
                                     </td>
-                                    <td class="px-6 py-4">
-                                        {{ $file->file->hash }}
+                                    <td class="px-6 py-4 text-center">
+                                        {{ $file->created_at->format('d/m/Y H:i') }}
                                     </td>
                                 </tr>
                             @endforeach

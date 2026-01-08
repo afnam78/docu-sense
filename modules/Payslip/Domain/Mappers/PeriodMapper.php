@@ -17,4 +17,12 @@ class PeriodMapper
             totalDays: is_numeric($totalDays) ? (int) $totalDays : null,
         );
     }
+
+    public static function isValidStructure(array $data): bool
+    {
+        return isset(
+            $data['fecha_inicio'],
+            $data['fecha_fin'],
+        );
+    }
 }

@@ -2,11 +2,11 @@
 
 namespace App\Providers;
 
-use App\Listeners\FileAnalyzedListener;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use Modules\File\Infrastructure\Events\FileAnalyzed;
+use Modules\File\Infrastructure\Listeners\FileAnalyzedListener;
 
 class AppServiceProvider extends ServiceProvider
 {

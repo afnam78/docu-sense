@@ -4,13 +4,17 @@ namespace Modules\Audit\Application\UseCases;
 
 use Modules\Audit\Application\Commands\AuditListCommand;
 use Modules\Audit\Application\Results\AuditListResult;
+use Modules\Audit\Domain\Contracts\AuditRepositoryInterface;
 use Modules\Audit\Domain\Exceptions\AuditNotFound;
 use Modules\File\Domain\Contracts\FileRepositoryInterface;
 use Modules\File\Domain\Entities\File;
 
 final readonly class AuditListUseCase
 {
-    public function __construct(private FileRepositoryInterface $fileRepository) {}
+    public function __construct(
+        private FileRepositoryInterface $fileRepository,
+        private AuditRepositoryInterface $auditRepository,
+    ) {}
 
     public function handle(AuditListCommand $command): AuditListResult
     {
@@ -31,7 +35,7 @@ final readonly class AuditListUseCase
         }
 
         return new AuditListResult(
-            hashes: $hashes,
+            hashes: $this->auditRepository->hashesWithAudit($hashes),
             fileName: $file->name()
         );
     }

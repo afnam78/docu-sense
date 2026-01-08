@@ -3,27 +3,28 @@
 namespace Modules\Audit\Domain\Services;
 
 use Modules\Audit\Domain\Contracts\ArithmeticCoherenceInterface;
+use Modules\Audit\Domain\Entities\AuditItem;
 use Modules\Audit\Domain\Enums\StatusEnum;
-use Modules\Audit\Domain\ValueObjects\AuditMessage;
+use Modules\Audit\Domain\ValueObjects\Log;
 use Modules\Payslip\Domain\Entities\Payslip;
 use Modules\Payslip\Domain\ValueObjects\Concept;
 
 final readonly class ArithmeticCoherence implements ArithmeticCoherenceInterface
 {
-    public function execute(Payslip $payslip): array
+    public function execute(Payslip $payslip): AuditItem
     {
-        $audits = [];
+        $logs = [];
 
         $accrualSum = collect($payslip->accruals())->sum(fn (Concept $item) => $item->amount()->amount());
         $extractedAccrualSum = $payslip->totals()->net()?->amount();
 
         if ($accrualSum !== $extractedAccrualSum) {
-            $audits[] = new AuditMessage(
+            $logs[] = new Log(
                 status: StatusEnum::CRITICAL,
                 title: 'Cálculo incorrecto de devengos'
             );
         } else {
-            $audits[] = new AuditMessage(
+            $logs[] = new Log(
                 status: StatusEnum::OK,
                 title: 'Cálculo correcto de devengos'
             );
@@ -33,12 +34,12 @@ final readonly class ArithmeticCoherence implements ArithmeticCoherenceInterface
         $extractedDeductionSum = $payslip->totals()->taxes()?->amount();
 
         if ($deductionSum !== $extractedDeductionSum) {
-            $audits[] = new AuditMessage(
+            $logs[] = new Log(
                 status: StatusEnum::CRITICAL,
                 title: 'Cálculo incorrecto de deducciones'
             );
         } else {
-            $audits[] = new AuditMessage(
+            $logs[] = new Log(
                 status: StatusEnum::OK,
                 title: 'Cálculo correcto de deducciones'
             );
@@ -48,17 +49,20 @@ final readonly class ArithmeticCoherence implements ArithmeticCoherenceInterface
         $extractedNetTotal = $payslip->totals()->total()?->amount();
 
         if ($netTotal !== $extractedNetTotal) {
-            $audits[] = new AuditMessage(
+            $logs[] = new Log(
                 status: StatusEnum::CRITICAL,
                 title: 'Cálculo incorrecto del total neto'
             );
         } else {
-            $audits[] = new AuditMessage(
+            $logs[] = new Log(
                 status: StatusEnum::OK,
                 title: 'Cálculo correcto del total neto'
             );
         }
 
-        return $audits;
+        return new AuditItem(
+            status: StatusEnum::getStatusByPriority(array_map(fn (Log $log) => $log->status(), $logs)),
+            logs: $logs,
+        );
     }
 }

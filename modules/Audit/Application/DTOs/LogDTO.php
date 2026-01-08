@@ -3,9 +3,9 @@
 namespace Modules\Audit\Application\DTOs;
 
 use Modules\Audit\Domain\Enums\StatusEnum;
-use Modules\Audit\Domain\ValueObjects\AuditMessage;
+use Modules\Audit\Domain\ValueObjects\Log;
 
-final readonly class AuditMessageDTO
+final readonly class LogDTO
 {
     public function __construct(
         public StatusEnum $status,
@@ -13,7 +13,7 @@ final readonly class AuditMessageDTO
         public ?string $message,
     ) {}
 
-    public static function fromObject(AuditMessage $object): self
+    public static function fromObject(Log $object): self
     {
         return new self(
             status: $object->status(),

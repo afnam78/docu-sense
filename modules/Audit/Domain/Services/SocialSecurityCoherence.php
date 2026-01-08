@@ -3,19 +3,23 @@
 namespace Modules\Audit\Domain\Services;
 
 use Modules\Audit\Domain\Contracts\SocialSecurityCoherenceInterface;
+use Modules\Audit\Domain\Entities\AuditItem;
 use Modules\Audit\Domain\Enums\StatusEnum;
-use Modules\Audit\Domain\ValueObjects\AuditMessage;
+use Modules\Audit\Domain\ValueObjects\Log;
 use Modules\Payslip\Domain\Entities\Payslip;
 use Modules\Payslip\Domain\ValueObjects\Concept;
 
 final readonly class SocialSecurityCoherence implements SocialSecurityCoherenceInterface
 {
-    public function execute(Payslip $payslip): array
+    public function execute(Payslip $payslip): AuditItem
     {
         $baseCC = $payslip->quoteBase()->commonContingencies()->amount();
 
         if (! $baseCC) {
-            return [];
+            return new AuditItem(
+                status: StatusEnum::OK,
+                logs: [],
+            );
         }
 
         $audits = [];
@@ -36,7 +40,7 @@ final readonly class SocialSecurityCoherence implements SocialSecurityCoherenceI
             $diff = abs(round($calculatedAmountCents) - $extractedAmountCents);
 
             if ($diff > 2) {
-                $audits[] = new AuditMessage(
+                $audits[] = new Log(
                     status: StatusEnum::WARNING,
                     title: "Desviación en {$deduction->concept()}",
                     message: sprintf(
@@ -47,13 +51,16 @@ final readonly class SocialSecurityCoherence implements SocialSecurityCoherenceI
                     )
                 );
             } else {
-                $audits[] = new AuditMessage(
+                $audits[] = new Log(
                     status: StatusEnum::OK,
                     title: "Verificación correcta de {$deduction->concept()}",
                 );
             }
         }
 
-        return $audits;
+        return new AuditItem(
+            status: StatusEnum::getStatusByPriority(array_map(fn (Log $log) => $log->status(), $audits)),
+            logs: $audits,
+        );
     }
 }

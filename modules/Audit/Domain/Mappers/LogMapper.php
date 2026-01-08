@@ -3,13 +3,13 @@
 namespace Modules\Audit\Domain\Mappers;
 
 use Modules\Audit\Domain\Enums\StatusEnum;
-use Modules\Audit\Domain\ValueObjects\AuditMessage;
+use Modules\Audit\Domain\ValueObjects\Log;
 
-class AuditMessageMapper
+class LogMapper
 {
-    public static function fromDB(array $data): AuditMessage
+    public static function fromDB(array $data): Log
     {
-        return new AuditMessage(
+        return new Log(
             status: StatusEnum::from($data['status']),
             title: $data['title'],
             message: $data['message'],

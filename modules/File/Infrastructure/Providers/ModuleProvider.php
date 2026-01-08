@@ -14,6 +14,7 @@ use Modules\File\Domain\Contracts\FileRepositoryInterface;
 use Modules\File\Domain\Contracts\OcrExtractServiceInterface;
 use Modules\File\Domain\Services\OcrExtractService;
 use Modules\File\Infrastructure\Repositories\FileRepository;
+use Modules\File\Presentation\Livewire\FileList;
 use Modules\File\Presentation\Livewire\FileUploader;
 
 class ModuleProvider extends ServiceProvider
@@ -33,5 +34,6 @@ class ModuleProvider extends ServiceProvider
         $this->loadMigrationsFrom(__DIR__.'/../Databases/Migrations');
         $this->loadViewsFrom(__DIR__.'/../../Presentation/Views', 'file');
         Livewire::component('file-uploader', FileUploader::class);
+        Livewire::component('file-list', FileList::class);
     }
 }

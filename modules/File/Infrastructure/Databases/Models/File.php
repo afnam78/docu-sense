@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Modules\Audit\Infrastructure\Databases\Models\Audit;
 use Modules\OpenAI\Infrastructure\Databases\Models\OpenAiRequest;
 
 class File extends Model
@@ -38,6 +39,11 @@ class File extends Model
             'hash',
             'hash'
         );
+    }
+
+    public function audits(): HasMany
+    {
+        return $this->hasMany(Audit::class, 'file_hash', 'hash');
     }
 
     public function file(): BelongsToMany

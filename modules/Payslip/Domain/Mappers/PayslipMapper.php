@@ -18,4 +18,16 @@ class PayslipMapper
             quoteBase: QuoteBaseMapper::fromResponse($data['bases_cotizacion']),
         );
     }
+
+    public static function isValidStructure(array $data): bool
+    {
+        return isset(
+            $data['empresa'],
+            $data['trabajador'],
+            $data['periodo'],
+            $data['totales'],
+            $data['bases_cotizacion']
+        ) && WorkerMapper::isValidStructure($data['trabajador'])
+          && PeriodMapper::isValidStructure($data['periodo']);
+    }
 }

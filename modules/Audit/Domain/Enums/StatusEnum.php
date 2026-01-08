@@ -38,4 +38,21 @@ enum StatusEnum: string
     {
         return $this === StatusEnum::INFO;
     }
+
+    public function priority(): int
+    {
+        return match ($this) {
+            StatusEnum::CRITICAL => 3,
+            StatusEnum::WARNING => 2,
+            StatusEnum::INFO => 1,
+            StatusEnum::OK => 0,
+        };
+    }
+
+    public static function getStatusByPriority(array $statuses): self
+    {
+        usort($statuses, fn (StatusEnum $a, StatusEnum $b) => $b->priority() <=> $a->priority());
+
+        return isset($statuses[0]) ? $statuses[0] : StatusEnum::OK;
+    }
 }
