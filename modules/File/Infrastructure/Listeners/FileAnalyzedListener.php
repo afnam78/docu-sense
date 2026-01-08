@@ -6,18 +6,19 @@ use Modules\Audit\Domain\Contracts\PayslipAuditServiceInterface;
 use Modules\File\Domain\Contracts\FileRepositoryInterface;
 use Modules\File\Domain\Entities\File;
 use Modules\File\Infrastructure\Events\FileAnalyzed;
+use Modules\File\Infrastructure\Events\FullDocumentAnalyzed;
 use Modules\OpenAI\Domain\Contracts\OpenAIRepositoryInterface;
 use Modules\Payslip\Domain\Mappers\PayslipMapper;
 
-class FileAnalyzedListener
+readonly class FileAnalyzedListener
 {
     /**
      * Create the event listener.
      */
     public function __construct(
-        private readonly FileRepositoryInterface $repository,
-        private readonly OpenAIRepositoryInterface $openAIRepository,
-        private readonly PayslipAuditServiceInterface $payslipAuditService
+        private FileRepositoryInterface $repository,
+        private OpenAIRepositoryInterface $openAIRepository,
+        private PayslipAuditServiceInterface $payslipAuditService
     ) {
         //
     }
@@ -27,17 +28,18 @@ class FileAnalyzedListener
      */
     public function handle(FileAnalyzed $event): void
     {
-        $this->manageSheets($event->fileHash());
+        $this->manageSheets($event->fileHash(), $event->userId());
         $this->generateAudit($event->fileHash(), $event->sheetHash());
     }
 
-    private function manageSheets(string $fileHash): void
+    private function manageSheets(string $fileHash, int $userId): void
     {
         $sheets = $this->repository->sheets($fileHash);
         $allSheetsAnalyzed = collect($sheets)->every(fn (File $sheet) => $sheet->status()->isDone());
 
         if ($allSheetsAnalyzed) {
             $this->repository->markAsDone($fileHash);
+            FullDocumentAnalyzed::dispatch($userId);
         }
     }
 

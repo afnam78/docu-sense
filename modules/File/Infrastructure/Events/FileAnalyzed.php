@@ -2,15 +2,12 @@
 
 namespace Modules\File\Infrastructure\Events;
 
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class FileAnalyzed implements ShouldBroadcast
+class FileAnalyzed
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable, SerializesModels;
 
     /**
      * Create a new event instance.
@@ -30,13 +27,8 @@ class FileAnalyzed implements ShouldBroadcast
         return $this->sheetHash;
     }
 
-    public function broadcastOn(): PrivateChannel
+    public function userId(): int
     {
-        return new PrivateChannel('App.Models.User.'.$this->userId);
-    }
-
-    public function broadcastAs(): string
-    {
-        return 'file.analyzed';
+        return $this->userId;
     }
 }
