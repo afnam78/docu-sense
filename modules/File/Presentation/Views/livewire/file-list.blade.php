@@ -39,7 +39,7 @@
                             @foreach($files as $file)
                                 <tr class="bg-white border-b border-gray-200 hover:bg-gray-50 ">
                                     <td class="px-6 py-4">
-                                        @if($file->file->status === StatusEnum::DONE->value)
+                                        @if($file->file->status === StatusEnum::DONE->value && $file->file->audits->isNotEmpty())
                                             <a href="{{ route('audit.detail', $file->file_hash) }}"
                                                class="">
                                                 <x-eye class="size-5"/>
