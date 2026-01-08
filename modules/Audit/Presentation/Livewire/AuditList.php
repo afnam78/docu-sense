@@ -14,7 +14,7 @@ class AuditList extends Component
 
     public string $fileName;
 
-    public string $selectedHash;
+    public ?string $selectedHash = null;
 
     public function render(): \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\View\View
     {
@@ -40,7 +40,7 @@ class AuditList extends Component
         }
     }
 
-    public function setSelectedHash(string $hash): void
+    public function setSelectedHash(?string $hash): void
     {
         $this->selectedHash = $hash;
     }
